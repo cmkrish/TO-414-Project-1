@@ -1,0 +1,42 @@
+---
+title: "TO 414 Project 1"
+author: "Chandramouli Krishnan, Rahul Rokkam, Kristian Olsen, Nick Davis, Lena Ivens, Sean Conway"
+date: "10/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+prospectData = read.csv("ProjectA_Listings2013.csv")
+#head(prospectData)
+
+summary(prospectData)
+#potential factors: loan status, scorexRange, income range, employment status, borrower state, 
+
+# potential numeric: 
+#potential boolean: incomeverification
+
+prospectData$loan_status = as.factor(prospectData$loan_status)
+prospectData$scorex = as.factor(prospectData$scorex)
+prospectData$income_range = as.factor(prospectData$income_range)
+prospectData$employment_status_description = as.factor(prospectData$employment_status_description)
+prospectData$borrower_state = as.factor(prospectData$borrower_state)
+prospectData$income_verifiable = as.logical(prospectData$income_verifiable)
+
+
+
+
+#unique(prospectData$occupation)
+```
+
+
+
+
+```{r}
+linreg = lm(borrower_rate~scorex+income_verifiable+income_range+is_homeowner+open_credit_lines+real_estate_balance,data = prospectData)
+summary(linreg)
+
+```
