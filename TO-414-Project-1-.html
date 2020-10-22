@@ -184,195 +184,42 @@ summary {
 
 </div>
 
+<div id="TOC">
+<ul>
+<li><a href="#clean-data">Clean Data</a></li>
+<li><a href="#linear-regression">Linear Regression</a></li>
+<li><a href="#logistic-regression">Logistic Regression</a></li>
+</ul>
+</div>
 
-<pre class="r"><code>prospectData = read.csv(&quot;ProjectA_Listings2013.csv&quot;)
-#head(prospectData)
+<div id="clean-data" class="section level2">
+<h2>Clean Data</h2>
+<p>To clean the Data, we changed the following variables to factors and logicals:</p>
+<ul>
+<li>loan_status</li>
+<li>scorex</li>
+<li>income_range</li>
+<li>employment_status_description</li>
+<li>borrower_state</li>
+<li>income_verifiable</li>
+</ul>
+</div>
+<div id="linear-regression" class="section level2">
+<h2>Linear Regression</h2>
+<pre><code>To create our Linear Regression, we first used all variables that we deemed pertinent to the regression - 
+excluding the dependent variable (borrower_rate), irrelevant variables (loan_origination_date, occupation, 
+borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our 
+regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days)
 
-summary(prospectData)</code></pre>
-<pre><code>##  number_of_days   principal_balance  loan_status    loan_status_description
-##  Min.   :  94.0   Min.   :    0.0   Min.   :1.000   Length:33542           
-##  1st Qu.: 816.0   1st Qu.:    0.0   1st Qu.:1.000   Class :character       
-##  Median : 879.0   Median :  903.8   Median :2.000   Mode  :character       
-##  Mean   : 879.3   Mean   : 3004.2   Mean   :2.406                          
-##  3rd Qu.: 974.0   3rd Qu.: 4872.1   3rd Qu.:4.000                          
-##  Max.   :1095.0   Max.   :32998.2   Max.   :4.000                          
-##                                                                            
-##  loan_origination_date amount_funded   prosper_rating     borrower_rate  
-##  Length:33542          Min.   : 2000   Length:33542       Min.   : 5.65  
-##  Class :character      1st Qu.: 4000   Class :character   1st Qu.:13.59  
-##  Mode  :character      Median :10000   Mode  :character   Median :17.69  
-##                        Mean   :10551                      Mean   :18.34  
-##                        3rd Qu.:15000                      3rd Qu.:22.72  
-##                        Max.   :35000                      Max.   :31.65  
-##                                                                          
-##   listing_term   listing_monthly_payment    scorex          prosper_score   
-##  Min.   :12.00   Min.   :  41.22         Length:33542       Min.   : 1.000  
-##  1st Qu.:36.00   1st Qu.: 165.15         Class :character   1st Qu.: 4.000  
-##  Median :36.00   Median : 295.81         Mode  :character   Median : 5.000  
-##  Mean   :45.19   Mean   : 325.38                            Mean   : 5.478  
-##  3rd Qu.:60.00   3rd Qu.: 419.94                            3rd Qu.: 7.000  
-##  Max.   :60.00   Max.   :2251.51                            Max.   :11.000  
-##                                                                             
-##  listing_category_id  income_range   income_range_description
-##  Min.   : 0.00       Min.   :1.000   Length:33542            
-##  1st Qu.: 1.00       1st Qu.:3.000   Class :character        
-##  Median : 1.00       Median :4.000   Mode  :character        
-##  Mean   : 2.83       Mean   :4.241                           
-##  3rd Qu.: 2.00       3rd Qu.:5.000                           
-##  Max.   :20.00       Max.   :7.000                           
-##                                                              
-##  stated_monthly_income income_verifiable dti_wprosper_loan  
-##  Min.   :     0        Mode :logical     Min.   :      0.0  
-##  1st Qu.:  3750        FALSE:2143        1st Qu.:      0.2  
-##  Median :  5250        TRUE :31399       Median :      0.2  
-##  Mean   :  6162                          Mean   :  62489.1  
-##  3rd Qu.:  7458                          3rd Qu.:      0.3  
-##  Max.   :618548                          Max.   :1000000.0  
-##                                                             
-##  employment_status_description  occupation        months_employed
-##  Length:33542                  Length:33542       Min.   :-35    
-##  Class :character              Class :character   1st Qu.: 32    
-##  Mode  :character              Mode  :character   Median : 83    
-##                                                   Mean   :110    
-##                                                   3rd Qu.:159    
-##                                                   Max.   :732    
-##                                                   NA's   :89     
-##  borrower_state     borrower_city      lender_indicator   monthly_debt  
-##  Length:33542       Length:33542       Min.   :0.00000   Min.   :    0  
-##  Class :character   Class :character   1st Qu.:0.00000   1st Qu.:  588  
-##  Mode  :character   Mode  :character   Median :0.00000   Median :  948  
-##                                        Mean   :0.05459   Mean   : 1100  
-##                                        3rd Qu.:0.00000   3rd Qu.: 1433  
-##                                        Max.   :1.00000   Max.   :48756  
-##                                                                         
-##  current_delinquencies delinquencies_last7_years public_records_last10_years
-##  Min.   : 0.0000       Min.   : 0.000            Min.   : 0.000             
-##  1st Qu.: 0.0000       1st Qu.: 0.000            1st Qu.: 0.000             
-##  Median : 0.0000       Median : 0.000            Median : 0.000             
-##  Mean   : 0.2948       Mean   : 3.823            Mean   : 0.309             
-##  3rd Qu.: 0.0000       3rd Qu.: 2.000            3rd Qu.: 1.000             
-##  Max.   :51.0000       Max.   :99.000            Max.   :34.000             
-##                                                                             
-##  public_records_last12_months first_recorded_credit_line
-##  Min.   : 0.000000            Length:33542              
-##  1st Qu.: 0.000000            Class :character          
-##  Median : 0.000000            Mode  :character          
-##  Mean   : 0.006738                                      
-##  3rd Qu.: 0.000000                                      
-##  Max.   :20.000000                                      
-##                                                         
-##  credit_lines_last7_years inquiries_last6_months amount_delinquent 
-##  Min.   :  2.00           Min.   : 0.0000        Min.   :     0.0  
-##  1st Qu.: 20.00           1st Qu.: 0.0000        1st Qu.:     0.0  
-##  Median : 27.00           Median : 0.0000        Median :     0.0  
-##  Mean   : 28.88           Mean   : 0.8391        Mean   :   942.6  
-##  3rd Qu.: 36.00           3rd Qu.: 1.0000        3rd Qu.:     0.0  
-##  Max.   :117.00           Max.   :15.0000        Max.   :463881.0  
-##                                                                    
-##  current_credit_lines open_credit_lines bankcard_utilization
-##  Min.   : 1.00        Min.   : 1.00     Min.   :0.0000      
-##  1st Qu.: 8.00        1st Qu.: 7.00     1st Qu.:0.4000      
-##  Median :10.00        Median : 9.00     Median :0.6400      
-##  Mean   :11.23        Mean   :10.33     Mean   :0.6003      
-##  3rd Qu.:14.00        3rd Qu.:13.00     3rd Qu.:0.8400      
-##  Max.   :54.00        Max.   :49.00     Max.   :1.5400      
-##                                                             
-##  total_open_revolving_accounts installment_balance real_estate_balance
-##  Min.   : 0.00                 Min.   :      0     Min.   :      0    
-##  1st Qu.: 5.00                 1st Qu.:   6603     1st Qu.:      0    
-##  Median : 7.00                 Median :  19140     Median :  59712    
-##  Mean   : 8.06                 Mean   :  30371     Mean   : 114853    
-##  3rd Qu.:10.00                 3rd Qu.:  39212     3rd Qu.: 187203    
-##  Max.   :46.00                 Max.   :3068804     Max.   :5163677    
-##                                NA's   :153                            
-##  revolving_balance real_estate_payment revolving_available_percent
-##  Min.   :      0   Min.   :     0.0    Min.   :  0.00             
-##  1st Qu.:   5973   1st Qu.:     0.0    1st Qu.: 28.00             
-##  Median :  12117   Median :   575.0    Median : 46.00             
-##  Mean   :  20884   Mean   :   872.9    Mean   : 46.57             
-##  3rd Qu.:  24719   3rd Qu.:  1428.0    3rd Qu.: 65.00             
-##  Max.   :1044446   Max.   :261009.0    Max.   :100.00             
-##                                                                   
-##  total_inquiries  total_trade_items satisfactory_accounts now_delinquent_derog
-##  Min.   : 0.000   Min.   :  2.00    Min.   :  2.0         Min.   : 0.0000     
-##  1st Qu.: 2.000   1st Qu.: 20.00    1st Qu.: 18.0         1st Qu.: 0.0000     
-##  Median : 3.000   Median : 27.00    Median : 25.0         Median : 0.0000     
-##  Mean   : 4.244   Mean   : 28.88    Mean   : 26.4         Mean   : 0.2948     
-##  3rd Qu.: 6.000   3rd Qu.: 36.00    3rd Qu.: 33.0         3rd Qu.: 0.0000     
-##  Max.   :78.000   Max.   :117.00    Max.   :117.0         Max.   :51.0000     
-##                                                                               
-##  was_delinquent_derog delinquencies_over30_days delinquencies_over60_days
-##  Min.   : 0.000       Min.   : 0.000            Min.   : 0.000           
-##  1st Qu.: 0.000       1st Qu.: 0.000            1st Qu.: 0.000           
-##  Median : 1.000       Median : 1.000            Median : 0.000           
-##  Mean   : 2.185       Mean   : 3.361            Mean   : 1.649           
-##  3rd Qu.: 3.000       3rd Qu.: 4.000            3rd Qu.: 2.000           
-##  Max.   :37.000       Max.   :99.000            Max.   :79.000           
-##                                                                          
-##  delinquencies_over90_days is_homeowner   
-##  Min.   : 0.000            Mode :logical  
-##  1st Qu.: 0.000            FALSE:15448    
-##  Median : 0.000            TRUE :18094    
-##  Mean   : 3.823                           
-##  3rd Qu.: 2.000                           
-##  Max.   :99.000                           
-## </code></pre>
-<pre class="r"><code>#potential factors: loan status, scorexRange, income range, employment status, borrower state, 
+We then used the function step() to...(whatever step does)...
 
-# potential numeric: 
-#potential boolean: incomeverification
+loan_status_description???
 
-prospectData$loan_status = as.factor(prospectData$loan_status)
-prospectData$scorex = as.factor(prospectData$scorex)
-prospectData$income_range = as.factor(prospectData$income_range)
-prospectData$employment_status_description = as.factor(prospectData$employment_status_description)
-prospectData$borrower_state = as.factor(prospectData$borrower_state)
-prospectData$income_verifiable = as.logical(prospectData$income_verifiable)
-
-
-
-
-#unique(prospectData$occupation)</code></pre>
-<pre class="r"><code>linreg = lm(borrower_rate~scorex+income_verifiable+income_range+is_homeowner+open_credit_lines+real_estate_balance,data = prospectData)
-summary(linreg)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = borrower_rate ~ scorex + income_verifiable + income_range + 
-##     is_homeowner + open_credit_lines + real_estate_balance, data = prospectData)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -15.4734  -3.5740  -0.3461   3.2190  19.9272 
-## 
-## Coefficients:
-##                         Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)            3.504e+01  2.465e+00  14.217  &lt; 2e-16 ***
-## scorex600-619          2.584e-01  3.542e-01   0.729 0.465741    
-## scorex620-639         -1.337e+00  3.233e-01  -4.136 3.54e-05 ***
-## scorex640-649         -2.301e+00  3.259e-01  -7.059 1.71e-12 ***
-## scorex650-664         -2.908e+00  3.148e-01  -9.236  &lt; 2e-16 ***
-## scorex665-689         -3.927e+00  3.069e-01 -12.795  &lt; 2e-16 ***
-## scorex690-701         -5.232e+00  3.141e-01 -16.657  &lt; 2e-16 ***
-## scorex702-723         -6.500e+00  3.077e-01 -21.123  &lt; 2e-16 ***
-## scorex724-747         -8.098e+00  3.083e-01 -26.267  &lt; 2e-16 ***
-## scorex748-777         -1.001e+01  3.096e-01 -32.343  &lt; 2e-16 ***
-## scorex778+            -1.275e+01  3.134e-01 -40.664  &lt; 2e-16 ***
-## income_verifiableTRUE -6.366e-01  1.117e-01  -5.700 1.21e-08 ***
-## income_range2         -6.910e+00  2.452e+00  -2.818 0.004834 ** 
-## income_range3         -8.823e+00  2.449e+00  -3.603 0.000315 ***
-## income_range4         -1.040e+01  2.449e+00  -4.247 2.17e-05 ***
-## income_range5         -1.097e+01  2.450e+00  -4.478 7.56e-06 ***
-## income_range6         -1.179e+01  2.450e+00  -4.812 1.50e-06 ***
-## income_range7          1.566e+00  2.509e+00   0.624 0.532511    
-## is_homeownerTRUE       4.541e-01  7.182e-02   6.322 2.62e-10 ***
-## open_credit_lines     -6.118e-03  5.836e-03  -1.048 0.294486    
-## real_estate_balance    3.534e-06  2.279e-07  15.507  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 4.892 on 33521 degrees of freedom
-## Multiple R-squared:  0.3539, Adjusted R-squared:  0.3535 
-## F-statistic: 918.2 on 20 and 33521 DF,  p-value: &lt; 2.2e-16</code></pre>
+</code></pre>
+</div>
+<div id="logistic-regression" class="section level2">
+<h2>Logistic Regression</h2>
+</div>
 
 
 
