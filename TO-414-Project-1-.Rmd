@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Clean Data
-```{r echo = FALSE, eval = FALSE}
+```{r echo = FALSE}
 prospectData = read.csv("ProjectA_Listings2013.csv")
 #head(prospectData)
 
@@ -52,17 +52,18 @@ To clean the Data, we changed the following variables to factors and logicals:
 
 
 ## Linear Regression
-```{r echo = FALSE, eval = FALSE}
+```{r echo = FALSE}
 
 # should we be including "loan_status" and "loan_status_description in this"?????
 linreg = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days,data = prospectData)
 
-summary(linreg)
 
-#stepModel <- step(linreg, direction = "backward")
+#summary(linreg)
+
+stepModel <- step(linreg, direction = "backward")
 #stepModel2 <- step(linreg, direction = "both")
 
-#summary(stepModel)
+summary(stepModel)
 
 ```
 
@@ -82,13 +83,34 @@ loan_status_description???
 
 
 ## Logistic Regression
-```{r echo = FALSE, eval = FALSE}
-#logReg <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable, data = prospectData, family = "binomial")
-#summary(logReg)
+```{r echo = TRUE}
+prospectDataNoNA = na.omit(prospectData)
 
-#stepLogreg <- step(logReg, direction = "both")
+logReg <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable, data = prospectDataNoNA, family = "binomial")
+
+#summary(prospectData)
+
+summary(logReg)
+
+#stepLogreg <- step(logReg, direction = "backward")
 
 
 #summary(stepLogreg)
+
+
+finalModel = glm(formula = Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + stated_monthly_income + delinquencies_last7_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + bankcard_utilization + revolving_balance + total_inquiries + was_delinquent_derog + delinquencies_over30_days + scorex + employment_status_description + income_verifiable, family = "binomial", data = prospectDataNoNA)
+
+summary(finalModel)
+
+```
+
+
+```{r echo=TRUE}
+
+logisticVar =  finalModel$call
+logisticVar
+linearVar = stepModel$call
+linearVar
+
 
 ```
