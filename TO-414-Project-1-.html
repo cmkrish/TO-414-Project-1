@@ -1007,28 +1007,184 @@ summary(finalModel)</code></pre>
 ## AIC: 15068
 ## 
 ## Number of Fisher Scoring iterations: 6</code></pre>
-<pre class="r"><code>logisticVar =  finalModel$call
+<pre class="r"><code>logisticVar =  finalModel$coefficients
 logisticVar</code></pre>
-<pre><code>## glm(formula = Defaulted ~ number_of_days + principal_balance + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     prosper_score + stated_monthly_income + delinquencies_last7_years + 
-##     public_records_last12_months + credit_lines_last7_years + 
-##     inquiries_last6_months + amount_delinquent + bankcard_utilization + 
-##     revolving_balance + total_inquiries + was_delinquent_derog + 
-##     delinquencies_over30_days + scorex + employment_status_description + 
-##     income_verifiable, family = &quot;binomial&quot;, data = prospectDataNoNA)</code></pre>
-<pre class="r"><code>linearVar = stepModel$call
+<pre><code>##                                (Intercept) 
+##                               8.995958e+00 
+##                             number_of_days 
+##                              -1.228866e-02 
+##                          principal_balance 
+##                               1.337349e-04 
+##                              amount_funded 
+##                              -1.934282e-04 
+##                               listing_term 
+##                               2.071145e-02 
+##                    listing_monthly_payment 
+##                               4.671632e-03 
+##                              prosper_score 
+##                              -1.762728e-01 
+##                      stated_monthly_income 
+##                              -3.302579e-05 
+##                  delinquencies_last7_years 
+##                              -5.297455e-03 
+##               public_records_last12_months 
+##                               2.042938e-01 
+##                   credit_lines_last7_years 
+##                               4.689246e-03 
+##                     inquiries_last6_months 
+##                              -9.561846e-02 
+##                          amount_delinquent 
+##                               6.096560e-06 
+##                       bankcard_utilization 
+##                              -4.110861e-01 
+##                          revolving_balance 
+##                              -1.365481e-06 
+##                            total_inquiries 
+##                               2.359180e-02 
+##                       was_delinquent_derog 
+##                              -2.725554e-02 
+##                  delinquencies_over30_days 
+##                               1.286742e-02 
+##                              scorex600-619 
+##                               3.629787e-01 
+##                              scorex620-639 
+##                               3.273725e-01 
+##                              scorex640-649 
+##                               3.732097e-01 
+##                              scorex650-664 
+##                               3.416438e-01 
+##                              scorex665-689 
+##                               5.269007e-01 
+##                              scorex690-701 
+##                               3.972385e-01 
+##                              scorex702-723 
+##                               3.761821e-01 
+##                              scorex724-747 
+##                               3.341512e-01 
+##                              scorex748-777 
+##                               1.510035e-01 
+##                                 scorex778+ 
+##                               2.029426e-01 
+##     employment_status_descriptionFull-time 
+##                               8.595839e-01 
+##  employment_status_descriptionNot employed 
+##                               2.273952e-01 
+##         employment_status_descriptionOther 
+##                               1.599383e-01 
+##     employment_status_descriptionPart-time 
+##                               9.295430e-01 
+##       employment_status_descriptionRetired 
+##                              -5.276365e-02 
+## employment_status_descriptionSelf-employed 
+##                              -1.261298e+00 
+##                      income_verifiableTRUE 
+##                              -8.127902e-01</code></pre>
+<pre class="r"><code>linearVar = stepModel$coefficients
 linearVar</code></pre>
-<pre><code>## lm(formula = borrower_rate ~ number_of_days + principal_balance + 
-##     loan_status + amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_available_percent + total_inquiries + satisfactory_accounts + 
-##     was_delinquent_derog + delinquencies_over30_days, data = prospectData)</code></pre>
+<pre><code>##                                (Intercept) 
+##                               3.164460e+01 
+##                             number_of_days 
+##                               3.276157e-03 
+##                          principal_balance 
+##                               7.196671e-05 
+##                               loan_status2 
+##                               1.970718e+00 
+##                               loan_status3 
+##                               9.683436e-01 
+##                               loan_status4 
+##                               5.248459e-01 
+##                              amount_funded 
+##                              -3.578034e-04 
+##                               listing_term 
+##                               1.190468e-01 
+##                    listing_monthly_payment 
+##                               8.408537e-03 
+##                              scorex600-619 
+##                               5.761994e-01 
+##                              scorex620-639 
+##                              -1.591488e-01 
+##                              scorex640-649 
+##                              -7.955541e-01 
+##                              scorex650-664 
+##                              -1.129296e+00 
+##                              scorex665-689 
+##                              -2.077369e+00 
+##                              scorex690-701 
+##                              -2.781312e+00 
+##                              scorex702-723 
+##                              -3.441212e+00 
+##                              scorex724-747 
+##                              -4.049751e+00 
+##                              scorex748-777 
+##                              -4.628637e+00 
+##                                 scorex778+ 
+##                              -4.567341e+00 
+##                              prosper_score 
+##                              -1.517976e+00 
+##                        listing_category_id 
+##                               5.755116e-02 
+##                              income_range2 
+##                              -8.780408e+00 
+##                              income_range3 
+##                              -1.008656e+01 
+##                              income_range4 
+##                              -1.046900e+01 
+##                              income_range5 
+##                              -1.042760e+01 
+##                              income_range6 
+##                              -1.035374e+01 
+##                              income_range7 
+##                              -5.652937e-01 
+##                      stated_monthly_income 
+##                              -7.911001e-06 
+##                          dti_wprosper_loan 
+##                              -6.838783e-07 
+##     employment_status_descriptionFull-time 
+##                               1.946562e-01 
+##  employment_status_descriptionNot employed 
+##                              -7.273595e-02 
+##         employment_status_descriptionOther 
+##                               2.123587e-01 
+##     employment_status_descriptionPart-time 
+##                              -1.825431e-01 
+##       employment_status_descriptionRetired 
+##                              -8.286028e-01 
+## employment_status_descriptionSelf-employed 
+##                              -8.607415e-01 
+##                            months_employed 
+##                              -3.283862e-04 
+##                               monthly_debt 
+##                               5.637460e-04 
+##                public_records_last10_years 
+##                               1.871888e-01 
+##                   credit_lines_last7_years 
+##                               1.913607e-01 
+##                     inquiries_last6_months 
+##                               3.063850e-02 
+##                          amount_delinquent 
+##                               7.278590e-06 
+##                       current_credit_lines 
+##                               2.871758e-02 
+##                          open_credit_lines 
+##                              -9.068822e-02 
+##                       bankcard_utilization 
+##                               2.496102e-01 
+##              total_open_revolving_accounts 
+##                               1.000603e-01 
+##                        installment_balance 
+##                              -1.179939e-06 
+##                        real_estate_balance 
+##                               3.129664e-07 
+##                revolving_available_percent 
+##                              -9.861388e-03 
+##                            total_inquiries 
+##                               2.280889e-02 
+##                      satisfactory_accounts 
+##                              -2.136163e-01 
+##                       was_delinquent_derog 
+##                              -1.050866e-01 
+##                  delinquencies_over30_days 
+##                               9.448407e-03</code></pre>
 </div>
 
 

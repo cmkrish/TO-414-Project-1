@@ -31,12 +31,14 @@ prospectData$borrower_state = as.factor(prospectData$borrower_state)
 prospectData$income_verifiable = as.logical(prospectData$income_verifiable)
 #prospectData$prosper_rating = as.factor(prospectData$prosper_rating)
 
-prospectData$Defaulted = ifelse(prospectData$loan_status_description == "DEFAULTED", 1, ifelse(prospectData$loan_status_description == "CHARGEOFF", 1, 0))
+prospectData$Defaulted = as.factor(ifelse(prospectData$loan_status_description == "DEFAULTED", 1, ifelse(prospectData$loan_status_description == "CHARGEOFF", 1, 0)))
 
 table(prospectData$Defaulted)
 
 
-unique(prospectData$prosper_rating)
+#unique(prospectData$prosper_rating)
+
+summary(prospectData)
 ```
 To clean the Data, we changed the following variables to factors and logicals:
 
@@ -53,18 +55,22 @@ To clean the Data, we changed the following variables to factors and logicals:
 
 ## Linear Regression
 ```{r echo = FALSE}
+prospectDataNoNA = na.omit(prospectData)
 
 # should we be including "loan_status" and "loan_status_description in this"?????
-linreg = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days,data = prospectData)
+#linreg = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days,data = prospectDataNoNA)
+
+
+linregWithInteractions = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + prosper_rating*prosper_score + income_range*stated_monthly_income + current_delinquencies*delinquencies_last7_years + public_records_last10_years*public_records_last12_months + credit_lines_last7_years*inquiries_last6_months,data = prospectDataNoNA)
 
 
 #summary(linreg)
 
-stepModel <- step(linreg, direction = "backward")
-#stepModel2 <- step(linreg, direction = "both")
+#stepModel <- step(linreg, direction = "backward")
+stepModel2 <- step(linregWithInteractions, direction = "backward")
 
-summary(stepModel)
-
+#summary(stepModel)
+summary(stepModel2)
 ```
 
 ```{}
@@ -84,33 +90,61 @@ loan_status_description???
 
 ## Logistic Regression
 ```{r echo = TRUE}
-prospectDataNoNA = na.omit(prospectData)
 
-logReg <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable, data = prospectDataNoNA, family = "binomial")
+
+#Test and train set b/c this montly income stuff doesn't make sense
+set.seed(1234)
+testrows = sample(1:nrow(prospectDataNoNA),100)
+
+trainingData = prospectDataNoNA[-testrows,]
+testData = prospectDataNoNA[testrows,]
+summary(testData$Defaulted)
+
+#logreg = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable, data = prospectDataNoNA, family = "binomial")
+
+
+#logreg1 = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines, data = prospectDataNoNA, family = "binomial")
+
+logreg2 = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years, data = prospectDataNoNA, family = "binomial")
+
+logreg3 =  glm(Defaulted ~ stated_monthly_income , data = trainingData, family = "binomial")
+
+#logRegWithInteraction <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable + prosper_rating*prosper_score + income_range*stated_monthly_income + current_delinquencies*delinquencies_last7_years + public_records_last10_years*public_records_last12_months + credit_lines_last7_years*inquiries_last6_months, data = prospectDataNoNA, family = "binomial")
 
 #summary(prospectData)
 
-summary(logReg)
+#summary(logReg)
 
-#stepLogreg <- step(logReg, direction = "backward")
+stepLogreg <- step(logreg2, direction = "backward")
 
 
 #summary(stepLogreg)
 
 
-finalModel = glm(formula = Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + stated_monthly_income + delinquencies_last7_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + bankcard_utilization + revolving_balance + total_inquiries + was_delinquent_derog + delinquencies_over30_days + scorex + employment_status_description + income_verifiable, family = "binomial", data = prospectDataNoNA)
+#finalModel = glm(formula = Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + stated_monthly_income + delinquencies_last7_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + bankcard_utilization + revolving_balance + total_inquiries + was_delinquent_derog + delinquencies_over30_days + scorex + employment_status_description + income_verifiable, family = "binomial", data = prospectDataNoNA)
+
+finalModel = stepLogreg
 
 summary(finalModel)
 
+predictedTest = predict(finalModel,newdata = testData,type = "response")
+summary(predictedTest)
+predictedTest = as.factor(ifelse(predictedTest > .5, 1,0))
+
+table(predictedTest,testData$Defaulted)
 ```
 
 
 ```{r echo=TRUE}
 
-logisticVar =  finalModel$call
-logisticVar
-linearVar = stepModel$call
-linearVar
+logisticVar =  finalModel$coefficients
+#logisticVar
+linearVar = stepModel$coefficients
+#linearVar
+
+differentVars = setdiff(names(linearVar),names(logisticVar))
+differentVars
+
 
 
 ```
