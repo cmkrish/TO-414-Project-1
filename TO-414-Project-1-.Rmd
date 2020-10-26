@@ -1,7 +1,7 @@
 ---
 title: "TO 414 Project 1"
 author: "Chandramouli Krishnan, Rahul Rokkam, Kristian Olsen, Nick Davis, Lena Ivens, Sean Conway"
-date: "10/11/2020"
+date: "10/25/2020"
 output: 
   html_document: 
     toc: yes
@@ -13,9 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Clean Data
-```{r echo = FALSE}
+```{r echo = FALSE, results='hide'}
 prospectData = read.csv("ProjectA_Listings2013.csv")
-#head(prospectData)
 
 #summary(prospectData)
 #potential factors: loan status, scorexRange, income range, employment status, borrower state, 
@@ -23,22 +22,21 @@ prospectData = read.csv("ProjectA_Listings2013.csv")
 # potential numeric: 
 #potential boolean: incomeverification
 
+
+# convert relevant variables to factors
 prospectData$loan_status = as.factor(prospectData$loan_status)
 prospectData$scorex = as.factor(prospectData$scorex)
 prospectData$income_range = as.factor(prospectData$income_range)
 prospectData$employment_status_description = as.factor(prospectData$employment_status_description)
 prospectData$borrower_state = as.factor(prospectData$borrower_state)
 prospectData$income_verifiable = as.logical(prospectData$income_verifiable)
-#prospectData$prosper_rating = as.factor(prospectData$prosper_rating)
 
+# create a variable that holds whether a loan defaulted or not
 prospectData$Defaulted = as.factor(ifelse(prospectData$loan_status_description == "DEFAULTED", 1, ifelse(prospectData$loan_status_description == "CHARGEOFF", 1, 0)))
 
-table(prospectData$Defaulted)
+#table(prospectData$Defaulted)
 
-
-#unique(prospectData$prosper_rating)
-
-summary(prospectData)
+#summary(prospectData)
 ```
 To clean the Data, we changed the following variables to factors and logicals:
 
@@ -49,102 +47,279 @@ To clean the Data, we changed the following variables to factors and logicals:
 * borrower_state
 * income_verifiable
 
-
+We also added a Defaulted variable that represented whether or not a loan had defaulted. 
 
 
 
 ## Linear Regression
-```{r echo = FALSE}
+```{r echo = FALSE,results='hide'}
+# remove NAs
 prospectDataNoNA = na.omit(prospectData)
 
-# should we be including "loan_status" and "loan_status_description in this"?????
-#linreg = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days,data = prospectDataNoNA)
-
-
+# linear regression with interactions
 linregWithInteractions = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + prosper_rating*prosper_score + income_range*stated_monthly_income + current_delinquencies*delinquencies_last7_years + public_records_last10_years*public_records_last12_months + credit_lines_last7_years*inquiries_last6_months,data = prospectDataNoNA)
 
-
-#summary(linreg)
-
-#stepModel <- step(linreg, direction = "backward")
 stepModel2 <- step(linregWithInteractions, direction = "backward")
 
-#summary(stepModel)
-summary(stepModel2)
 ```
 
-```{}
-To create our Linear Regression, we first used all variables that we deemed pertinent to the regression - 
-excluding the dependent variable (borrower_rate), irrelevant variables (loan_origination_date, occupation, 
-borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our 
-regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days)
 
-We then used the function step() to...(whatever step does)...
+To create our Linear Regression, we first used all variables that we deemed pertinent to the regression - excluding the dependent variable (borrower_rate), irrelevant variables (loan_origination_date, occupation, borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days)
 
-loan_status_description???
+We then tested interaction effects with variables we believed had a high chance of interacting: prosper_rating & prosper_score, income_range & stated_monthly_income, current_delinquencies & delinquencies_last7_years,  public_records_last10_years & public_records_last12_months, and credit_lines_last7_years & inquiries_last6_months
 
-
-```
-
+After including all possible relevant variables and interactions, we used a step function to step through our model and prune away variables which did not lead to a better model. This final step model gave us a relatively high R^2 rate of 0.95.
 
 
 ## Logistic Regression
-```{r echo = TRUE}
+```{r echo = FALSE, results='hide'}
 
 
 #Test and train set b/c this montly income stuff doesn't make sense
-set.seed(1234)
-testrows = sample(1:nrow(prospectDataNoNA),100)
+#set.seed(1234)
+#testrows = sample(1:nrow(prospectDataNoNA),100)
 
-trainingData = prospectDataNoNA[-testrows,]
-testData = prospectDataNoNA[testrows,]
-summary(testData$Defaulted)
+#trainingData = prospectDataNoNA[-testrows,]
+#testData = prospectDataNoNA[testrows,]
+#summary(testData$Defaulted)
 
-#logreg = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable, data = prospectDataNoNA, family = "binomial")
+#Logistic Regression predicting default including interaction terms
+logRegWithInteraction <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable + prosper_rating*prosper_score + current_delinquencies*delinquencies_last7_years + credit_lines_last7_years*inquiries_last6_months, data = prospectDataNoNA, family = "binomial")
 
-
-#logreg1 = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines, data = prospectDataNoNA, family = "binomial")
-
-logreg2 = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years, data = prospectDataNoNA, family = "binomial")
-
-logreg3 =  glm(Defaulted ~ stated_monthly_income , data = trainingData, family = "binomial")
-
-#logRegWithInteraction <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable + prosper_rating*prosper_score + income_range*stated_monthly_income + current_delinquencies*delinquencies_last7_years + public_records_last10_years*public_records_last12_months + credit_lines_last7_years*inquiries_last6_months, data = prospectDataNoNA, family = "binomial")
-
-#summary(prospectData)
-
-#summary(logReg)
-
-stepLogreg <- step(logreg2, direction = "backward")
+#stepLogreg <- step(logRegWithInteraction, direction = "backward")
 
 
-#summary(stepLogreg)
+#finalModel = stepLogreg
+
+#summary(finalModel)
+
+finalFormula = glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + delinquencies_last7_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + bankcard_utilization + revolving_balance + total_inquiries + was_delinquent_derog + delinquencies_over30_days + scorex + employment_status_description + income_verifiable + prosper_rating,data=prospectDataNoNA,family = "binomial")
+
+finalModel = finalFormula
+
+#predictedTest = predict(finalModel,newdata = testData,type = "response")
+#summary(predictedTest)
+#predictedTest = as.factor(ifelse(predictedTest > .5, 1,0))
+
+#table(predictedTest,testData$Defaulted)
+```
 
 
-#finalModel = glm(formula = Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + stated_monthly_income + delinquencies_last7_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + bankcard_utilization + revolving_balance + total_inquiries + was_delinquent_derog + delinquencies_over30_days + scorex + employment_status_description + income_verifiable, family = "binomial", data = prospectDataNoNA)
+To create our Logistic Regression, we first used all variables that we deemed pertinent to the regression - excluding the dependent variable (Default), irrelevant variables (loan_origination_date, occupation, borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days). 
+
+We then tested the same interaction effects from the Linear Regression: prosper_rating & prosper_score, income_range & stated_monthly_income, current_delinquencies & delinquencies_last7_years, public_records_last10_years & public_records_last12_months, and credit_lines_last7_years & inquiries_last6_months.
+
+The stated monthly income feature was causing the following error in our logistic regression: glm.fit: fitted probabilities numerically 0 or 1 occurred. When we tested this out, we found that this error was stemming from the fact that when we used this variable to predict Default, it predicted "Not Defaulted" for every loan in our test set. Because of the inaccuracy resulting from this variable, we removed it from consideration in our Logistic Model. 
+
+After including all possible relevant variables and interactions, we used a step function to step through our model and prune away variables which did not lead to a better model. This final Step function gave us a minimized AIC of 15014.
+
+
+```{r echo= FALSE, results='hide'}
+
+logisticVar =  finalModel$coefficients
+#formula = finalModel$formula
+#formula
+#logisticVar
+linearVar = stepModel2$coefficients
+#linearVar
+
+# variables that appear in linear but not logistic
+differentVars1 = setdiff(names(linearVar),names(logisticVar))
+#differentVars1
+# variables that appear in logistic but not linear
+differentVars2 = setdiff(names(logisticVar),names(linearVar))
+#differentVars2
+
+varsInBoth = intersect(names(logisticVar),names(linearVar))
+#varsInBoth
+
+
+#Get Coefficient Values of variables in linear but not in logisic
+for(i in 1:length(differentVars1)){
+  #print(linearVar[differentVars1[[i]]])
+}
+
+print("In logistic but not linear")
+
+#Get Coefficient values of variables in logistic but not in linear
+for(i in 1:length(differentVars2)){
+  #print(logisticVar[differentVars2[[i]]])
+}
+
+print("In both logistic and linear")
+
+for(i in 1:length(varsInBoth)){
+  coeffLin = linearVar[varsInBoth[[i]]]
+  coeffLog = logisticVar[varsInBoth[[i]]]
+  if(sign(coeffLog) != sign(coeffLin)){
+    print(coeffLog)
+    print(coeffLin)
+  }
+}
+
+```
+
+# Arbitrage Opportunity Analysis:
+
+After building these two models, we broke down the areas of arbitrage into 6 possible categories. There are 4 scenarios of arbitrage where the variables are in one model but not the other. The remaining two areas of arbitrage occur from the variables which are present in both models but have opposite coefficients. 
+
+## Variable in one Regression but not other
+#### Variable in Linear but not Logistic
+
+If Variable positive (This variable increases rate but does not impact default). This means that these are important variables to focus on from a lender perspective, as they will result in a higher interest rate for the lender but will not increase the risk that the borrower defaults on the loan. These variables are listed below.
+
+  * loan_status2 
+  * loan_status3 
+  * listing_category_id 
+  * dti_wprosper_loan
+  * monthly_debt
+  * current_delinquencies
+  * public_records_last10_years 
+  * current_credit_lines 
+  * total_open_revolving_accounts 
+  * prosper_score:prosper_ratingAA 
+  * prosper_score:prosper_ratingHR 
+  * income_range5:stated_monthly_income
+  
+If Variable negative (This variable decreases rate but does not impact default). These are variables to avoid from a lender perspective because while they do not increase the rate of default, they also do not provide increased returns for the lender. These variables are listed below 
+    
+  * loan_status4 
+  * stated_monthly_income
+  * open_credit_lines 
+  * revolving_available_percent 
+  * delinquencies_over60_days 
+  * prosper_score:prosper_ratingB 
+  * prosper_score:prosper_ratingC 
+  * prosper_score:prosper_ratingD 
+  * prosper_score:prosper_ratingE 
+  * income_range2:stated_monthly_income 
+  * income_range3:stated_monthly_income 
+  * income_range4:stated_monthly_income 
+  * current_delinquencies:delinquencies_last7_years 
+  * public_records_last10_years:public_records_last12_months 
+    
+#### Variable in Logistic but not Linear
+
+If Variable Positive (This variable increases chance of default but does not impact rate). These are also characteristics that lenders should avoid as they will NOT offer a higher rate of return, but they will increase the risk of default on the loan. **There are no variables in this category**
+    
+If Variable negative (This variable decreases chance of default but does not impact rate). These variables are good for the lender as they signify as lower risk of default on the loan. However, they do not correlate with a change in the interest rate. There is one variable in this category listed below.
+    
+  * revolving_balance 
+    
+    
+##Variables with opposite sign coefficients
+Variable positive in Linear but negative in Logistic (This variable increases rate but decreases the chance of default). These characteristics are fantastic for the lender as they signify a higher interest rate for the lender with a lower chance of default. These variables are listed below. 
+  
+  * number_of_days 
+  * income_range7 
+  * delinquencies_last7_years 
+  * bankcard_utilization 
+  * was_delinquent_derog 
+  * income_verifiableTRUE 
+  * prosper_ratingB 
+  * prosper_ratingC 
+  
+Variable positive in Logistic but negative in Linear (This variable decreases rate but increases the chance of default). These variables are not good as the presence of these variables represents a high risk for default, but lenders are not subsequently rewarded with higher rates of return on the loan. Potential lenders should be weary of loans with high values for these features.  
+  
+  * principal_balance 
+  * credit_lines_last7_years 
+  * scorex702-723 
+  * scorex724-747 
+  * scorex748-777 
+  * scorex778+
+
+#Conclusion
+
+After cleaning our underlying data from Prosper, we performed linear and logistic regressions on this data, using the stepwise function to aid in feature selection. This process resulted in two sets of features and corresponding coefficients. We then grouped these coefficients into 6 possible Arbitrage opportunities. The first two of these groups were the variables that were in the Linear regression but not in the Logisitic regression. These variables allow us to arbitrage the potential interest rates since they do not have an effect on the risk of default. The next two groups were variables that were present in the Logistic regression but not the Linear regression. These variables allow us to arbitrage the default risk, as they provde extra insight into the possibility of default. The final two groups were variables that were present in both models. These are variables that provide us with arbitrage opportunities as they help determine if a loan with a lower interest rate truly has a lower risk of default and vice versa. If using these variables, we determine a loan with high rate does not have a high risk of default, we have an Arbitrage opportunity to exploit.  
+
+
+#Appendix
+Code that enabled us to perform this analysis
+```{r echo=TRUE, eval=FALSE}
+prospectData = read.csv("ProjectA_Listings2013.csv")
+
+# convert relevant variables to factors
+prospectData$loan_status = as.factor(prospectData$loan_status)
+prospectData$scorex = as.factor(prospectData$scorex)
+prospectData$income_range = as.factor(prospectData$income_range)
+prospectData$employment_status_description = as.factor(prospectData$employment_status_description)
+prospectData$borrower_state = as.factor(prospectData$borrower_state)
+prospectData$income_verifiable = as.logical(prospectData$income_verifiable)
+
+# create a variable that holds whether a loan defaulted or not
+prospectData$Defaulted = as.factor(ifelse(prospectData$loan_status_description == "DEFAULTED", 1, ifelse(prospectData$loan_status_description == "CHARGEOFF", 1, 0)))
+
+
+############### Linear Regression Section ###########################
+prospectDataNoNA = na.omit(prospectData)
+
+# linear regression with interactions
+linregWithInteractions = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + prosper_rating*prosper_score + income_range*stated_monthly_income + current_delinquencies*delinquencies_last7_years + public_records_last10_years*public_records_last12_months + credit_lines_last7_years*inquiries_last6_months,data = prospectDataNoNA)
+
+stepModel2 <- step(linregWithInteractions, direction = "backward")
+
+
+############# Logistic Regression Section ############################
+
+#Logistic Regression predicting default including interaction terms
+logRegWithInteraction <- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable + prosper_rating*prosper_score + current_delinquencies*delinquencies_last7_years + credit_lines_last7_years*inquiries_last6_months, data = prospectDataNoNA, family = "binomial")
+
+stepLogreg <- step(logRegWithInteraction, direction = "backward")
+
 
 finalModel = stepLogreg
 
-summary(finalModel)
-
-predictedTest = predict(finalModel,newdata = testData,type = "response")
-summary(predictedTest)
-predictedTest = as.factor(ifelse(predictedTest > .5, 1,0))
-
-table(predictedTest,testData$Defaulted)
-```
 
 
-```{r echo=TRUE}
-
+######################### Arbitrage Analysis Section ###############################################
 logisticVar =  finalModel$coefficients
 #logisticVar
-linearVar = stepModel$coefficients
+linearVar = stepModel2$coefficients
 #linearVar
 
-differentVars = setdiff(names(linearVar),names(logisticVar))
-differentVars
+# variables that appear in linear but not logistic
+differentVars1 = setdiff(names(linearVar),names(logisticVar))
+#differentVars1
+# variables that appear in logistic but not linear
+differentVars2 = setdiff(names(logisticVar),names(linearVar))
+#differentVars2
+
+varsInBoth = intersect(names(logisticVar),names(linearVar))
+#varsInBoth
 
 
+#Get Coefficient Values of variables in linear but not in logisic
+for(i in 1:length(differentVars1)){
+  print(linearVar[differentVars1[[i]]])
+}
 
+print("In logistic but not linear")
+
+#Get Coefficient values of variables in logistic but not in linear
+for(i in 1:length(differentVars2)){
+  print(logisticVar[differentVars2[[i]]])
+}
+
+print("In both logistic and linear")
+
+#Get coefficients that are in both models but have different signs in each model
+for(i in 1:length(varsInBoth)){
+  coeffLin = linearVar[varsInBoth[[i]]]
+  coeffLog = logisticVar[varsInBoth[[i]]]
+  if(sign(coeffLog) != sign(coeffLin)){
+    print(coeffLog)
+    print(coeffLin)
+  }
+}
 ```
+### Output of Final Linear Regression (predicting borrower rate)
+```{r,echo=FALSE}
+summary(stepModel2)
+```
+### Output of Final Logistic Regression (predicting default)
+```{r,echo=FALSE}
+summary(finalModel)
+```
+
+
+

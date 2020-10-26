@@ -11,7 +11,7 @@
 
 <meta name="author" content="Chandramouli Krishnan, Rahul Rokkam, Kristian Olsen, Nick Davis, Lena Ivens, Sean Conway" />
 
-<meta name="date" content="2020-10-11" />
+<meta name="date" content="2020-10-25" />
 
 <title>TO 414 Project 1</title>
 
@@ -180,7 +180,7 @@ summary {
 
 <h1 class="title toc-ignore">TO 414 Project 1</h1>
 <h4 class="author">Chandramouli Krishnan, Rahul Rokkam, Kristian Olsen, Nick Davis, Lena Ivens, Sean Conway</h4>
-<h4 class="date">10/11/2020</h4>
+<h4 class="date">10/25/2020</h4>
 
 </div>
 
@@ -189,15 +189,20 @@ summary {
 <li><a href="#clean-data">Clean Data</a></li>
 <li><a href="#linear-regression">Linear Regression</a></li>
 <li><a href="#logistic-regression">Logistic Regression</a></li>
+<li><a href="#arbitrage-opportunity-analysis">Arbitrage Opportunity Analysis:</a><ul>
+<li><a href="#variable-in-one-regression-but-not-other">Variable in one Regression but not other</a></li>
+<li><a href="#variables-with-opposite-sign-coefficients">Variables with opposite sign coefficients</a></li>
+</ul></li>
+<li><a href="#conclusion">Conclusion</a></li>
+<li><a href="#appendix">Appendix</a><ul>
+<li><a href="#output-of-final-linear-regression-predicting-borrower-rate">Output of Final Linear Regression (predicting borrower rate)</a></li>
+<li><a href="#output-of-final-logistic-regression-predicting-default">Output of Final Logistic Regression (predicting default)</a></li>
+</ul></li>
 </ul>
 </div>
 
 <div id="clean-data" class="section level2">
 <h2>Clean Data</h2>
-<pre><code>## 
-##     0     1 
-## 29225  4317</code></pre>
-<pre><code>## [1] &quot;B&quot;  &quot;D&quot;  &quot;E&quot;  &quot;HR&quot; &quot;A&quot;  &quot;AA&quot; &quot;C&quot;</code></pre>
 <p>To clean the Data, we changed the following variables to factors and logicals:</p>
 <ul>
 <li>loan_status</li>
@@ -207,984 +212,479 @@ summary {
 <li>borrower_state</li>
 <li>income_verifiable</li>
 </ul>
+<p>We also added a Defaulted variable that represented whether or not a loan had defaulted.</p>
 </div>
 <div id="linear-regression" class="section level2">
 <h2>Linear Regression</h2>
-<pre><code>## Start:  AIC=76512.53
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + income_verifiable + dti_wprosper_loan + 
-##     employment_status_description + months_employed + monthly_debt + 
-##     current_delinquencies + delinquencies_last7_years + public_records_last10_years + 
-##     public_records_last12_months + credit_lines_last7_years + 
-##     inquiries_last6_months + amount_delinquent + current_credit_lines + 
-##     open_credit_lines + bankcard_utilization + total_open_revolving_accounts + 
-##     installment_balance + real_estate_balance + revolving_balance + 
-##     real_estate_payment + revolving_available_percent + total_inquiries + 
-##     satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + 
-##     delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - delinquencies_last7_years      1         0 330196 76511
-## - current_delinquencies          1         0 330197 76511
-## - income_verifiable              1         1 330197 76511
-## - was_delinquent_derog           1         2 330198 76511
-## - revolving_balance              1         2 330198 76511
-## - credit_lines_last7_years       1         4 330201 76511
-## - satisfactory_accounts          1         5 330201 76511
-## - public_records_last12_months   1         6 330203 76511
-## - real_estate_payment            1        13 330209 76512
-## - dti_wprosper_loan              1        15 330211 76512
-## - delinquencies_over60_days      1        16 330212 76512
-## &lt;none&gt;                                       330196 76513
-## - real_estate_balance            1        24 330220 76513
-## - inquiries_last6_months         1        28 330225 76513
-## - months_employed                1        34 330230 76514
-## - current_credit_lines           1        41 330238 76515
-## - stated_monthly_income          1        44 330241 76515
-## - installment_balance            1        46 330243 76515
-## - bankcard_utilization           1        48 330245 76515
-## - delinquencies_over30_days      1        76 330272 76518
-## - amount_delinquent              1       101 330297 76521
-## - total_inquiries                1       146 330343 76525
-## - employment_status_description  6       420 330616 76543
-## - open_credit_lines              1       332 330529 76544
-## - public_records_last10_years    1       397 330593 76551
-## - revolving_available_percent    1       463 330660 76557
-## - principal_balance              1      1004 331200 76612
-## - total_open_revolving_accounts  1      1327 331523 76644
-## - listing_category_id            1      1826 332022 76694
-## - monthly_debt                   1      2704 332900 76782
-## - number_of_days                 1      3729 333926 76885
-## - income_range                   6      4679 334875 76969
-## - listing_monthly_payment        1      5388 335584 77049
-## - loan_status                    3      6530 336727 77159
-## - amount_funded                  1      8799 338995 77386
-## - listing_term                   1     25226 355423 78962
-## - scorex                        10     33244 363441 79687
-## - prosper_score                  1    255270 585466 95582
-## 
-## Step:  AIC=76510.53
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + income_verifiable + dti_wprosper_loan + 
-##     employment_status_description + months_employed + monthly_debt + 
-##     current_delinquencies + public_records_last10_years + public_records_last12_months + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_balance + real_estate_payment + revolving_available_percent + 
-##     total_inquiries + satisfactory_accounts + was_delinquent_derog + 
-##     delinquencies_over30_days + delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - current_delinquencies          1         0 330197 76509
-## - income_verifiable              1         1 330197 76509
-## - was_delinquent_derog           1         2 330198 76509
-## - revolving_balance              1         2 330198 76509
-## - credit_lines_last7_years       1         4 330201 76509
-## - satisfactory_accounts          1         5 330201 76509
-## - public_records_last12_months   1         6 330203 76509
-## - real_estate_payment            1        13 330209 76510
-## - dti_wprosper_loan              1        15 330211 76510
-## - delinquencies_over60_days      1        19 330215 76510
-## &lt;none&gt;                                       330196 76511
-## - real_estate_balance            1        24 330220 76511
-## - inquiries_last6_months         1        28 330225 76511
-## - months_employed                1        34 330230 76512
-## - current_credit_lines           1        41 330238 76513
-## - stated_monthly_income          1        44 330241 76513
-## - installment_balance            1        46 330243 76513
-## - bankcard_utilization           1        48 330245 76513
-## - delinquencies_over30_days      1        77 330274 76516
-## - amount_delinquent              1       103 330299 76519
-## - total_inquiries                1       146 330343 76523
-## - employment_status_description  6       420 330616 76541
-## - open_credit_lines              1       333 330529 76542
-## - public_records_last10_years    1       397 330593 76549
-## - revolving_available_percent    1       463 330660 76555
-## - principal_balance              1      1004 331200 76610
-## - total_open_revolving_accounts  1      1327 331523 76642
-## - listing_category_id            1      1826 332022 76692
-## - monthly_debt                   1      2705 332901 76780
-## - number_of_days                 1      3730 333926 76883
-## - income_range                   6      4679 334875 76967
-## - listing_monthly_payment        1      5388 335584 77047
-## - loan_status                    3      6532 336728 77157
-## - amount_funded                  1      8799 338995 77384
-## - listing_term                   1     25227 355423 78960
-## - scorex                        10     33245 363441 79685
-## - prosper_score                  1    255270 585466 95580
-## 
-## Step:  AIC=76508.57
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + income_verifiable + dti_wprosper_loan + 
-##     employment_status_description + months_employed + monthly_debt + 
-##     public_records_last10_years + public_records_last12_months + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_balance + real_estate_payment + revolving_available_percent + 
-##     total_inquiries + satisfactory_accounts + was_delinquent_derog + 
-##     delinquencies_over30_days + delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - income_verifiable              1         1 330198 76507
-## - revolving_balance              1         2 330199 76507
-## - public_records_last12_months   1         6 330203 76507
-## - real_estate_payment            1        13 330210 76508
-## - dti_wprosper_loan              1        15 330212 76508
-## - delinquencies_over60_days      1        19 330216 76508
-## &lt;none&gt;                                       330197 76509
-## - real_estate_balance            1        24 330221 76509
-## - inquiries_last6_months         1        28 330225 76509
-## - months_employed                1        34 330231 76510
-## - current_credit_lines           1        41 330238 76511
-## - stated_monthly_income          1        44 330241 76511
-## - installment_balance            1        46 330243 76511
-## - bankcard_utilization           1        48 330245 76511
-## - delinquencies_over30_days      1        77 330274 76514
-## - amount_delinquent              1       102 330299 76517
-## - total_inquiries                1       146 330343 76521
-## - employment_status_description  6       420 330616 76539
-## - was_delinquent_derog           1       323 330519 76539
-## - open_credit_lines              1       333 330530 76540
-## - public_records_last10_years    1       398 330594 76547
-## - revolving_available_percent    1       463 330660 76553
-## - principal_balance              1      1004 331201 76608
-## - credit_lines_last7_years       1      1218 331415 76629
-## - total_open_revolving_accounts  1      1327 331524 76640
-## - satisfactory_accounts          1      1465 331662 76654
-## - listing_category_id            1      1826 332023 76690
-## - monthly_debt                   1      2704 332901 76778
-## - number_of_days                 1      3730 333927 76881
-## - income_range                   6      4679 334876 76965
-## - listing_monthly_payment        1      5388 335584 77046
-## - loan_status                    3      6531 336728 77155
-## - amount_funded                  1      8799 338995 77382
-## - listing_term                   1     25227 355424 78958
-## - scorex                        10     33246 363443 79683
-## - prosper_score                  1    255274 585471 95578
-## 
-## Step:  AIC=76506.66
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     public_records_last12_months + credit_lines_last7_years + 
-##     inquiries_last6_months + amount_delinquent + current_credit_lines + 
-##     open_credit_lines + bankcard_utilization + total_open_revolving_accounts + 
-##     installment_balance + real_estate_balance + revolving_balance + 
-##     real_estate_payment + revolving_available_percent + total_inquiries + 
-##     satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + 
-##     delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - revolving_balance              1         2 330200 76505
-## - public_records_last12_months   1         6 330204 76505
-## - real_estate_payment            1        13 330211 76506
-## - delinquencies_over60_days      1        19 330217 76507
-## &lt;none&gt;                                       330198 76507
-## - real_estate_balance            1        24 330222 76507
-## - inquiries_last6_months         1        28 330226 76508
-## - months_employed                1        34 330231 76508
-## - current_credit_lines           1        41 330239 76509
-## - stated_monthly_income          1        44 330242 76509
-## - installment_balance            1        46 330244 76509
-## - bankcard_utilization           1        48 330246 76510
-## - delinquencies_over30_days      1        77 330275 76512
-## - amount_delinquent              1       102 330300 76515
-## - total_inquiries                1       146 330344 76519
-## - dti_wprosper_loan              1       251 330448 76530
-## - was_delinquent_derog           1       323 330520 76537
-## - open_credit_lines              1       333 330531 76538
-## - employment_status_description  6       454 330651 76540
-## - public_records_last10_years    1       398 330595 76545
-## - revolving_available_percent    1       463 330661 76551
-## - principal_balance              1      1004 331202 76606
-## - credit_lines_last7_years       1      1218 331416 76627
-## - total_open_revolving_accounts  1      1327 331524 76638
-## - satisfactory_accounts          1      1465 331663 76652
-## - listing_category_id            1      1826 332024 76688
-## - monthly_debt                   1      2704 332902 76776
-## - number_of_days                 1      3730 333927 76879
-## - income_range                   6      4679 334876 76963
-## - listing_monthly_payment        1      5389 335587 77044
-## - loan_status                    3      6531 336729 77153
-## - amount_funded                  1      8800 338997 77380
-## - listing_term                   1     25229 355426 78956
-## - scorex                        10     33246 363444 79681
-## - prosper_score                  1    255343 585540 95580
-## 
-## Step:  AIC=76504.85
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     public_records_last12_months + credit_lines_last7_years + 
-##     inquiries_last6_months + amount_delinquent + current_credit_lines + 
-##     open_credit_lines + bankcard_utilization + total_open_revolving_accounts + 
-##     installment_balance + real_estate_balance + real_estate_payment + 
-##     revolving_available_percent + total_inquiries + satisfactory_accounts + 
-##     was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - public_records_last12_months   1         7 330206 76504
-## - real_estate_payment            1        13 330212 76504
-## - delinquencies_over60_days      1        19 330218 76505
-## &lt;none&gt;                                       330200 76505
-## - real_estate_balance            1        27 330226 76506
-## - inquiries_last6_months         1        29 330229 76506
-## - months_employed                1        34 330233 76506
-## - current_credit_lines           1        42 330242 76507
-## - stated_monthly_income          1        43 330243 76507
-## - bankcard_utilization           1        47 330247 76508
-## - installment_balance            1        48 330247 76508
-## - delinquencies_over30_days      1        77 330277 76511
-## - amount_delinquent              1       103 330303 76513
-## - total_inquiries                1       145 330345 76517
-## - dti_wprosper_loan              1       249 330449 76528
-## - was_delinquent_derog           1       325 330525 76536
-## - open_credit_lines              1       341 330541 76537
-## - employment_status_description  6       454 330653 76539
-## - public_records_last10_years    1       396 330596 76543
-## - revolving_available_percent    1       511 330710 76554
-## - principal_balance              1      1005 331205 76604
-## - credit_lines_last7_years       1      1222 331421 76626
-## - total_open_revolving_accounts  1      1404 331603 76644
-## - satisfactory_accounts          1      1468 331668 76651
-## - listing_category_id            1      1836 332035 76687
-## - monthly_debt                   1      3007 333207 76805
-## - number_of_days                 1      3728 333928 76877
-## - income_range                   6      4688 334888 76962
-## - listing_monthly_payment        1      5390 335590 77042
-## - loan_status                    3      6530 336729 77151
-## - amount_funded                  1      8801 339000 77379
-## - listing_term                   1     25227 355426 78954
-## - scorex                        10     33486 363685 79701
-## - prosper_score                  1    255996 586195 95616
-## 
-## Step:  AIC=76503.51
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     real_estate_payment + revolving_available_percent + total_inquiries + 
-##     satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + 
-##     delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - real_estate_payment            1        13 330219 76503
-## - delinquencies_over60_days      1        19 330225 76503
-## &lt;none&gt;                                       330206 76504
-## - real_estate_balance            1        27 330233 76504
-## - inquiries_last6_months         1        29 330235 76504
-## - months_employed                1        34 330240 76505
-## - current_credit_lines           1        43 330249 76506
-## - stated_monthly_income          1        44 330250 76506
-## - bankcard_utilization           1        47 330253 76506
-## - installment_balance            1        48 330254 76506
-## - delinquencies_over30_days      1        79 330285 76509
-## - amount_delinquent              1       103 330309 76512
-## - total_inquiries                1       144 330350 76516
-## - dti_wprosper_loan              1       249 330455 76527
-## - was_delinquent_derog           1       328 330534 76535
-## - open_credit_lines              1       342 330548 76536
-## - employment_status_description  6       452 330659 76537
-## - public_records_last10_years    1       454 330660 76547
-## - revolving_available_percent    1       512 330718 76553
-## - principal_balance              1      1005 331211 76603
-## - credit_lines_last7_years       1      1221 331427 76624
-## - total_open_revolving_accounts  1      1403 331609 76643
-## - satisfactory_accounts          1      1467 331673 76649
-## - listing_category_id            1      1839 332045 76686
-## - monthly_debt                   1      3011 333217 76804
-## - number_of_days                 1      3737 333943 76876
-## - income_range                   6      4689 334895 76961
-## - listing_monthly_payment        1      5399 335605 77042
-## - loan_status                    3      6535 336741 77150
-## - amount_funded                  1      8810 339016 77378
-## - listing_term                   1     25248 355455 78955
-## - scorex                        10     33482 363688 79700
-## - prosper_score                  1    255990 586197 95614
-## 
-## Step:  AIC=76502.82
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_available_percent + total_inquiries + satisfactory_accounts + 
-##     was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## - delinquencies_over60_days      1        19 330238 76503
-## &lt;none&gt;                                       330219 76503
-## - inquiries_last6_months         1        29 330249 76504
-## - months_employed                1        34 330253 76504
-## - current_credit_lines           1        42 330261 76505
-## - stated_monthly_income          1        44 330263 76505
-## - bankcard_utilization           1        47 330266 76506
-## - installment_balance            1        50 330269 76506
-## - real_estate_balance            1        52 330271 76506
-## - delinquencies_over30_days      1        79 330298 76509
-## - amount_delinquent              1       103 330322 76511
-## - total_inquiries                1       145 330364 76515
-## - dti_wprosper_loan              1       249 330468 76526
-## - was_delinquent_derog           1       328 330547 76534
-## - open_credit_lines              1       340 330559 76535
-## - employment_status_description  6       452 330672 76536
-## - public_records_last10_years    1       454 330673 76547
-## - revolving_available_percent    1       514 330733 76553
-## - principal_balance              1      1004 331223 76602
-## - credit_lines_last7_years       1      1221 331440 76624
-## - total_open_revolving_accounts  1      1398 331617 76642
-## - satisfactory_accounts          1      1467 331686 76648
-## - listing_category_id            1      1838 332057 76686
-## - monthly_debt                   1      3013 333232 76803
-## - number_of_days                 1      3739 333958 76876
-## - income_range                   6      4687 334906 76960
-## - listing_monthly_payment        1      5398 335617 77041
-## - loan_status                    3      6534 336753 77149
-## - amount_funded                  1      8810 339029 77378
-## - listing_term                   1     25249 355468 78954
-## - scorex                        10     33469 363688 79698
-## - prosper_score                  1    255994 586213 95613
-## 
-## Step:  AIC=76502.73
-## borrower_rate ~ number_of_days + principal_balance + loan_status + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_available_percent + total_inquiries + satisfactory_accounts + 
-##     was_delinquent_derog + delinquencies_over30_days
-## 
-##                                 Df Sum of Sq    RSS   AIC
-## &lt;none&gt;                                       330238 76503
-## - inquiries_last6_months         1        29 330267 76504
-## - months_employed                1        34 330272 76504
-## - current_credit_lines           1        43 330281 76505
-## - stated_monthly_income          1        43 330281 76505
-## - bankcard_utilization           1        47 330285 76505
-## - installment_balance            1        50 330288 76506
-## - real_estate_balance            1        51 330289 76506
-## - delinquencies_over30_days      1        60 330298 76507
-## - amount_delinquent              1        99 330337 76511
-## - total_inquiries                1       144 330382 76515
-## - dti_wprosper_loan              1       249 330487 76526
-## - open_credit_lines              1       340 330578 76535
-## - was_delinquent_derog           1       342 330580 76535
-## - employment_status_description  6       452 330690 76536
-## - public_records_last10_years    1       449 330687 76546
-## - revolving_available_percent    1       516 330754 76553
-## - principal_balance              1      1005 331243 76602
-## - credit_lines_last7_years       1      1202 331440 76622
-## - total_open_revolving_accounts  1      1402 331640 76642
-## - satisfactory_accounts          1      1448 331686 76646
-## - listing_category_id            1      1837 332075 76685
-## - monthly_debt                   1      3020 333258 76804
-## - number_of_days                 1      3749 333987 76877
-## - income_range                   6      4680 334918 76959
-## - listing_monthly_payment        1      5400 335638 77041
-## - loan_status                    3      6536 336774 77149
-## - amount_funded                  1      8814 339052 77378
-## - listing_term                   1     25246 355483 78954
-## - scorex                        10     33452 363690 79696
-## - prosper_score                  1    256120 586358 95619</code></pre>
+<p>To create our Linear Regression, we first used all variables that we deemed pertinent to the regression - excluding the dependent variable (borrower_rate), irrelevant variables (loan_origination_date, occupation, borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days)</p>
+<p>We then tested interaction effects with variables we believed had a high chance of interacting: prosper_rating &amp; prosper_score, income_range &amp; stated_monthly_income, current_delinquencies &amp; delinquencies_last7_years, public_records_last10_years &amp; public_records_last12_months, and credit_lines_last7_years &amp; inquiries_last6_months</p>
+<p>After including all possible relevant variables and interactions, we used a step function to step through our model and prune away variables which did not lead to a better model. This final step model gave us a relatively high R^2 rate of 0.95.</p>
+</div>
+<div id="logistic-regression" class="section level2">
+<h2>Logistic Regression</h2>
+<p>To create our Logistic Regression, we first used all variables that we deemed pertinent to the regression - excluding the dependent variable (Default), irrelevant variables (loan_origination_date, occupation, borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days).</p>
+<p>We then tested the same interaction effects from the Linear Regression: prosper_rating &amp; prosper_score, income_range &amp; stated_monthly_income, current_delinquencies &amp; delinquencies_last7_years, public_records_last10_years &amp; public_records_last12_months, and credit_lines_last7_years &amp; inquiries_last6_months.</p>
+<p>The stated monthly income feature was causing the following error in our logistic regression: glm.fit: fitted probabilities numerically 0 or 1 occurred. When we tested this out, we found that this error was stemming from the fact that when we used this variable to predict Default, it predicted &quot;Not Defaulted&quot; for every loan in our test set. Because of the inaccuracy resulting from this variable, we removed it from consideration in our Logistic Model.</p>
+<p>After including all possible relevant variables and interactions, we used a step function to step through our model and prune away variables which did not lead to a better model. This final Step function gave us a minimized AIC of 15014.</p>
+</div>
+<div id="arbitrage-opportunity-analysis" class="section level1">
+<h1>Arbitrage Opportunity Analysis:</h1>
+<p>After building these two models, we broke down the areas of arbitrage into 6 possible categories. There are 4 scenarios of arbitrage where the variables are in one model but not the other. The remaining two areas of arbitrage occur from the variables which are present in both models but have opposite coefficients.</p>
+<div id="variable-in-one-regression-but-not-other" class="section level2">
+<h2>Variable in one Regression but not other</h2>
+<div id="variable-in-linear-but-not-logistic" class="section level4">
+<h4>Variable in Linear but not Logistic</h4>
+<p>If Variable positive (This variable increases rate but does not impact default). This means that these are important variables to focus on from a lender perspective, as they will result in a higher interest rate for the lender but will not increase the risk that the borrower defaults on the loan. These variables are listed below.</p>
+<ul>
+<li>loan_status2</li>
+<li>loan_status3</li>
+<li>listing_category_id</li>
+<li>dti_wprosper_loan</li>
+<li>monthly_debt</li>
+<li>current_delinquencies</li>
+<li>public_records_last10_years</li>
+<li>current_credit_lines</li>
+<li>total_open_revolving_accounts</li>
+<li>prosper_score:prosper_ratingAA</li>
+<li>prosper_score:prosper_ratingHR</li>
+<li>income_range5:stated_monthly_income</li>
+</ul>
+<p>If Variable negative (This variable decreases rate but does not impact default). These are variables to avoid from a lender perspective because while they do not increase the rate of default, they also do not provide increased returns for the lender. These variables are listed below</p>
+<ul>
+<li>loan_status4</li>
+<li>stated_monthly_income</li>
+<li>open_credit_lines</li>
+<li>revolving_available_percent</li>
+<li>delinquencies_over60_days</li>
+<li>prosper_score:prosper_ratingB</li>
+<li>prosper_score:prosper_ratingC</li>
+<li>prosper_score:prosper_ratingD</li>
+<li>prosper_score:prosper_ratingE</li>
+<li>income_range2:stated_monthly_income</li>
+<li>income_range3:stated_monthly_income</li>
+<li>income_range4:stated_monthly_income</li>
+<li>current_delinquencies:delinquencies_last7_years</li>
+<li>public_records_last10_years:public_records_last12_months</li>
+</ul>
+</div>
+<div id="variable-in-logistic-but-not-linear" class="section level4">
+<h4>Variable in Logistic but not Linear</h4>
+<p>If Variable Positive (This variable increases chance of default but does not impact rate). These are also characteristics that lenders should avoid as they will NOT offer a higher rate of return, but they will increase the risk of default on the loan. <strong>There are no variables in this category</strong></p>
+<p>If Variable negative (This variable decreases chance of default but does not impact rate). These variables are good for the lender as they signify as lower risk of default on the loan. However, they do not correlate with a change in the interest rate. There is one variable in this category listed below.</p>
+<ul>
+<li>revolving_balance</li>
+</ul>
+</div>
+</div>
+<div id="variables-with-opposite-sign-coefficients" class="section level2">
+<h2>Variables with opposite sign coefficients</h2>
+<p>Variable positive in Linear but negative in Logistic (This variable increases rate but decreases the chance of default). These characteristics are fantastic for the lender as they signify a higher interest rate for the lender with a lower chance of default. These variables are listed below.</p>
+<ul>
+<li>number_of_days</li>
+<li>income_range7</li>
+<li>delinquencies_last7_years</li>
+<li>bankcard_utilization</li>
+<li>was_delinquent_derog</li>
+<li>income_verifiableTRUE</li>
+<li>prosper_ratingB</li>
+<li>prosper_ratingC</li>
+</ul>
+<p>Variable positive in Logistic but negative in Linear (This variable decreases rate but increases the chance of default). These variables are not good as the presence of these variables represents a high risk for default, but lenders are not subsequently rewarded with higher rates of return on the loan. Potential lenders should be weary of loans with high values for these features.</p>
+<ul>
+<li>principal_balance</li>
+<li>credit_lines_last7_years</li>
+<li>scorex702-723</li>
+<li>scorex724-747</li>
+<li>scorex748-777</li>
+<li>scorex778+</li>
+</ul>
+</div>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>After cleaning our underlying data from Prosper, we performed linear and logistic regressions on this data, using the stepwise function to aid in feature selection. This process resulted in two sets of features and corresponding coefficients. We then grouped these coefficients into 6 possible Arbitrage opportunities. The first two of these groups were the variables that were in the Linear regression but not in the Logisitic regression. These variables allow us to arbitrage the potential interest rates since they do not have an effect on the risk of default. The next two groups were variables that were present in the Logistic regression but not the Linear regression. These variables allow us to arbitrage the default risk, as they provde extra insight into the possibility of default. The final two groups were variables that were present in both models. These are variables that provide us with arbitrage opportunities as they help determine if a loan with a lower interest rate truly has a lower risk of default and vice versa. If using these variables, we determine a loan with high rate does not have a high risk of default, we have an Arbitrage opportunity to exploit.</p>
+</div>
+<div id="appendix" class="section level1">
+<h1>Appendix</h1>
+<p>Code that enabled us to perform this analysis</p>
+<pre class="r"><code>prospectData = read.csv(&quot;ProjectA_Listings2013.csv&quot;)
+
+# convert relevant variables to factors
+prospectData$loan_status = as.factor(prospectData$loan_status)
+prospectData$scorex = as.factor(prospectData$scorex)
+prospectData$income_range = as.factor(prospectData$income_range)
+prospectData$employment_status_description = as.factor(prospectData$employment_status_description)
+prospectData$borrower_state = as.factor(prospectData$borrower_state)
+prospectData$income_verifiable = as.logical(prospectData$income_verifiable)
+
+# create a variable that holds whether a loan defaulted or not
+prospectData$Defaulted = as.factor(ifelse(prospectData$loan_status_description == &quot;DEFAULTED&quot;, 1, ifelse(prospectData$loan_status_description == &quot;CHARGEOFF&quot;, 1, 0)))
+
+
+############### Linear Regression Section ###########################
+prospectDataNoNA = na.omit(prospectData)
+
+# linear regression with interactions
+linregWithInteractions = lm(borrower_rate ~ number_of_days + principal_balance + loan_status + amount_funded + listing_term + listing_monthly_payment + scorex + prosper_score + listing_category_id + income_range + stated_monthly_income + income_verifiable + dti_wprosper_loan + employment_status_description + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + prosper_rating*prosper_score + income_range*stated_monthly_income + current_delinquencies*delinquencies_last7_years + public_records_last10_years*public_records_last12_months + credit_lines_last7_years*inquiries_last6_months,data = prospectDataNoNA)
+
+stepModel2 &lt;- step(linregWithInteractions, direction = &quot;backward&quot;)
+
+
+############# Logistic Regression Section ############################
+
+#Logistic Regression predicting default including interaction terms
+logRegWithInteraction &lt;- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable + prosper_rating*prosper_score + current_delinquencies*delinquencies_last7_years + credit_lines_last7_years*inquiries_last6_months, data = prospectDataNoNA, family = &quot;binomial&quot;)
+
+stepLogreg &lt;- step(logRegWithInteraction, direction = &quot;backward&quot;)
+
+
+finalModel = stepLogreg
+
+
+
+######################### Arbitrage Analysis Section ###############################################
+logisticVar =  finalModel$coefficients
+#logisticVar
+linearVar = stepModel2$coefficients
+#linearVar
+
+# variables that appear in linear but not logistic
+differentVars1 = setdiff(names(linearVar),names(logisticVar))
+#differentVars1
+# variables that appear in logistic but not linear
+differentVars2 = setdiff(names(logisticVar),names(linearVar))
+#differentVars2
+
+varsInBoth = intersect(names(logisticVar),names(linearVar))
+#varsInBoth
+
+
+#Get Coefficient Values of variables in linear but not in logisic
+for(i in 1:length(differentVars1)){
+  print(linearVar[differentVars1[[i]]])
+}
+
+print(&quot;In logistic but not linear&quot;)
+
+#Get Coefficient values of variables in logistic but not in linear
+for(i in 1:length(differentVars2)){
+  print(logisticVar[differentVars2[[i]]])
+}
+
+print(&quot;In both logistic and linear&quot;)
+
+#Get coefficients that are in both models but have different signs in each model
+for(i in 1:length(varsInBoth)){
+  coeffLin = linearVar[varsInBoth[[i]]]
+  coeffLog = logisticVar[varsInBoth[[i]]]
+  if(sign(coeffLog) != sign(coeffLin)){
+    print(coeffLog)
+    print(coeffLin)
+  }
+}</code></pre>
+<div id="output-of-final-linear-regression-predicting-borrower-rate" class="section level3">
+<h3>Output of Final Linear Regression (predicting borrower rate)</h3>
 <pre><code>## 
 ## Call:
 ## lm(formula = borrower_rate ~ number_of_days + principal_balance + 
 ##     loan_status + amount_funded + listing_term + listing_monthly_payment + 
 ##     scorex + prosper_score + listing_category_id + income_range + 
-##     stated_monthly_income + dti_wprosper_loan + employment_status_description + 
-##     months_employed + monthly_debt + public_records_last10_years + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_available_percent + total_inquiries + satisfactory_accounts + 
-##     was_delinquent_derog + delinquencies_over30_days, data = prospectData)
+##     stated_monthly_income + income_verifiable + dti_wprosper_loan + 
+##     employment_status_description + monthly_debt + current_delinquencies + 
+##     delinquencies_last7_years + public_records_last10_years + 
+##     public_records_last12_months + credit_lines_last7_years + 
+##     inquiries_last6_months + amount_delinquent + current_credit_lines + 
+##     open_credit_lines + bankcard_utilization + total_open_revolving_accounts + 
+##     revolving_available_percent + total_inquiries + was_delinquent_derog + 
+##     delinquencies_over30_days + delinquencies_over60_days + prosper_rating + 
+##     prosper_score:prosper_rating + income_range:stated_monthly_income + 
+##     current_delinquencies:delinquencies_last7_years + public_records_last10_years:public_records_last12_months, 
+##     data = prospectDataNoNA)
 ## 
 ## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -31.1050  -2.1104  -0.1805   1.9823  21.5849 
+##     Min      1Q  Median      3Q     Max 
+## -6.7917 -0.8665  0.0058  0.8839  5.9976 
 ## 
-## Coefficients:
-##                                              Estimate Std. Error  t value
-## (Intercept)                                 3.164e+01  1.607e+00   19.698
-## number_of_days                              3.276e-03  1.686e-04   19.427
-## principal_balance                           7.197e-05  7.155e-06   10.058
-## loan_status2                                1.971e+00  8.741e-02   22.546
-## loan_status3                                9.683e-01  8.606e-02   11.252
-## loan_status4                                5.248e-01  4.863e-02   10.792
-## amount_funded                              -3.578e-04  1.201e-05  -29.789
-## listing_term                                1.190e-01  2.361e-03   50.415
-## listing_monthly_payment                     8.409e-03  3.606e-04   23.318
-## scorex600-619                               5.762e-01  2.291e-01    2.515
-## scorex620-639                              -1.591e-01  2.094e-01   -0.760
-## scorex640-649                              -7.956e-01  2.116e-01   -3.759
-## scorex650-664                              -1.129e+00  2.050e-01   -5.510
-## scorex665-689                              -2.077e+00  2.007e-01  -10.353
-## scorex690-701                              -2.781e+00  2.063e-01  -13.480
-## scorex702-723                              -3.441e+00  2.035e-01  -16.913
-## scorex724-747                              -4.050e+00  2.059e-01  -19.670
-## scorex748-777                              -4.629e+00  2.097e-01  -22.069
-## scorex778+                                 -4.567e+00  2.186e-01  -20.891
-## prosper_score                              -1.518e+00  9.453e-03 -160.580
-## listing_category_id                         5.755e-02  4.231e-03   13.601
-## income_range2                              -8.780e+00  1.582e+00   -5.551
-## income_range3                              -1.009e+01  1.580e+00   -6.385
-## income_range4                              -1.047e+01  1.580e+00   -6.627
-## income_range5                              -1.043e+01  1.580e+00   -6.599
-## income_range6                              -1.035e+01  1.581e+00   -6.549
-## income_range7                              -5.653e-01  1.776e+00   -0.318
-## stated_monthly_income                      -7.911e-06  3.784e-06   -2.090
-## dti_wprosper_loan                          -6.839e-07  1.365e-07   -5.009
-## employment_status_descriptionFull-time      1.947e-01  1.649e-01    1.180
-## employment_status_descriptionNot employed  -7.274e-02  9.213e-01   -0.079
-## employment_status_descriptionOther          2.124e-01  8.233e-02    2.579
-## employment_status_descriptionPart-time     -1.825e-01  1.288e+00   -0.142
-## employment_status_descriptionRetired       -8.286e-01  6.904e-01   -1.200
-## employment_status_descriptionSelf-employed -8.607e-01  1.482e-01   -5.810
-## months_employed                            -3.284e-04  1.768e-04   -1.857
-## monthly_debt                                5.637e-04  3.233e-05   17.438
-## public_records_last10_years                 1.872e-01  2.783e-02    6.726
-## credit_lines_last7_years                    1.914e-01  1.739e-02   11.003
-## inquiries_last6_months                      3.064e-02  1.788e-02    1.713
-## amount_delinquent                           7.279e-06  2.310e-06    3.151
-## current_credit_lines                        2.872e-02  1.382e-02    2.078
-## open_credit_lines                          -9.069e-02  1.549e-02   -5.853
-## bankcard_utilization                        2.496e-01  1.146e-01    2.178
-## total_open_revolving_accounts               1.001e-01  8.423e-03   11.879
-## installment_balance                        -1.180e-06  5.253e-07   -2.246
-## real_estate_balance                         3.130e-07  1.382e-07    2.264
-## revolving_available_percent                -9.861e-03  1.368e-03   -7.206
-## total_inquiries                             2.281e-02  5.985e-03    3.811
-## satisfactory_accounts                      -2.136e-01  1.769e-02  -12.075
-## was_delinquent_derog                       -1.051e-01  1.790e-02   -5.871
-## delinquencies_over30_days                   9.448e-03  3.830e-03    2.467
-##                                            Pr(&gt;|t|)    
-## (Intercept)                                 &lt; 2e-16 ***
-## number_of_days                              &lt; 2e-16 ***
-## principal_balance                           &lt; 2e-16 ***
-## loan_status2                                &lt; 2e-16 ***
-## loan_status3                                &lt; 2e-16 ***
-## loan_status4                                &lt; 2e-16 ***
-## amount_funded                               &lt; 2e-16 ***
-## listing_term                                &lt; 2e-16 ***
-## listing_monthly_payment                     &lt; 2e-16 ***
-## scorex600-619                              0.011921 *  
-## scorex620-639                              0.447230    
-## scorex640-649                              0.000171 ***
-## scorex650-664                              3.62e-08 ***
-## scorex665-689                               &lt; 2e-16 ***
-## scorex690-701                               &lt; 2e-16 ***
-## scorex702-723                               &lt; 2e-16 ***
-## scorex724-747                               &lt; 2e-16 ***
-## scorex748-777                               &lt; 2e-16 ***
-## scorex778+                                  &lt; 2e-16 ***
-## prosper_score                               &lt; 2e-16 ***
-## listing_category_id                         &lt; 2e-16 ***
-## income_range2                              2.86e-08 ***
-## income_range3                              1.73e-10 ***
-## income_range4                              3.48e-11 ***
-## income_range5                              4.21e-11 ***
-## income_range6                              5.87e-11 ***
-## income_range7                              0.750227    
-## stated_monthly_income                      0.036583 *  
-## dti_wprosper_loan                          5.50e-07 ***
-## employment_status_descriptionFull-time     0.237830    
-## employment_status_descriptionNot employed  0.937071    
-## employment_status_descriptionOther         0.009904 ** 
-## employment_status_descriptionPart-time     0.887309    
-## employment_status_descriptionRetired       0.230077    
-## employment_status_descriptionSelf-employed 6.31e-09 ***
-## months_employed                            0.063289 .  
-## monthly_debt                                &lt; 2e-16 ***
-## public_records_last10_years                1.78e-11 ***
-## credit_lines_last7_years                    &lt; 2e-16 ***
-## inquiries_last6_months                     0.086651 .  
-## amount_delinquent                          0.001628 ** 
-## current_credit_lines                       0.037724 *  
-## open_credit_lines                          4.86e-09 ***
-## bankcard_utilization                       0.029399 *  
-## total_open_revolving_accounts               &lt; 2e-16 ***
-## installment_balance                        0.024688 *  
-## real_estate_balance                        0.023566 *  
-## revolving_available_percent                5.87e-13 ***
-## total_inquiries                            0.000138 ***
-## satisfactory_accounts                       &lt; 2e-16 ***
-## was_delinquent_derog                       4.37e-09 ***
-## delinquencies_over30_days                  0.013622 *  
+## Coefficients: (2 not defined because of singularities)
+##                                                            Estimate Std. Error
+## (Intercept)                                               8.244e+00  6.956e-01
+## number_of_days                                            3.269e-03  6.977e-05
+## principal_balance                                        -9.768e-06  2.966e-06
+## loan_status2                                              1.335e+00  3.617e-02
+## loan_status3                                              3.278e-01  3.551e-02
+## loan_status4                                             -7.103e-03  2.011e-02
+## amount_funded                                            -6.552e-05  5.130e-06
+## listing_term                                              5.692e-02  1.036e-03
+## listing_monthly_payment                                   2.292e-03  1.542e-04
+## scorex600-619                                             3.286e-01  9.465e-02
+## scorex620-639                                             2.181e-01  8.638e-02
+## scorex640-649                                             1.723e-01  8.738e-02
+## scorex650-664                                             3.103e-01  8.466e-02
+## scorex665-689                                             1.813e-01  8.293e-02
+## scorex690-701                                             6.991e-02  8.522e-02
+## scorex702-723                                            -6.272e-02  8.398e-02
+## scorex724-747                                            -2.671e-01  8.479e-02
+## scorex748-777                                            -4.437e-01  8.589e-02
+## scorex778+                                               -4.950e-01  8.848e-02
+## prosper_score                                            -2.536e-01  1.027e-02
+## listing_category_id                                       1.841e-02  1.748e-03
+## income_range2                                             1.680e-02  6.655e-01
+## income_range3                                            -6.744e-02  6.582e-01
+## income_range4                                            -4.220e-02  6.615e-01
+## income_range5                                            -3.856e-01  6.825e-01
+## income_range6                                            -2.418e-01  6.543e-01
+## income_range7                                             1.850e-01  7.318e-01
+## stated_monthly_income                                    -3.408e-06  1.557e-06
+## income_verifiableTRUE                                     3.312e-01  1.937e-01
+## dti_wprosper_loan                                         3.319e-07  1.881e-07
+## employment_status_descriptionFull-time                    1.272e-01  6.801e-02
+## employment_status_descriptionNot employed                 1.777e-01  3.799e-01
+## employment_status_descriptionOther                        5.385e-02  3.399e-02
+## employment_status_descriptionPart-time                    4.086e-01  5.309e-01
+## employment_status_descriptionRetired                     -4.907e-01  2.846e-01
+## employment_status_descriptionSelf-employed               -3.080e-01  6.362e-02
+## monthly_debt                                              5.237e-05  1.253e-05
+## current_delinquencies                                     7.826e-02  9.013e-03
+## delinquencies_last7_years                                 7.990e-04  1.184e-03
+## public_records_last10_years                               1.292e-02  1.191e-02
+## public_records_last12_months                              1.885e-01  9.380e-02
+## credit_lines_last7_years                                 -6.097e-03  8.455e-04
+## inquiries_last6_months                                   -2.553e-02  7.385e-03
+## amount_delinquent                                         2.172e-06  9.652e-07
+## current_credit_lines                                      1.706e-02  5.684e-03
+## open_credit_lines                                        -2.856e-02  6.282e-03
+## bankcard_utilization                                      1.101e-01  4.717e-02
+## total_open_revolving_accounts                             1.816e-02  3.254e-03
+## revolving_available_percent                              -9.072e-04  5.533e-04
+## total_inquiries                                           7.721e-03  2.435e-03
+## was_delinquent_derog                                      2.302e-02  3.968e-03
+## delinquencies_over30_days                                 5.196e-03  1.784e-03
+## delinquencies_over60_days                                -6.012e-03  3.593e-03
+## prosper_ratingAA                                         -3.090e+00  2.621e-01
+## prosper_ratingB                                           3.083e+00  9.866e-02
+## prosper_ratingC                                           6.930e+00  9.288e-02
+## prosper_ratingD                                           1.043e+01  9.889e-02
+## prosper_ratingE                                           1.506e+01  1.028e-01
+## prosper_ratingHR                                          1.709e+01  1.291e-01
+## prosper_score:prosper_ratingAA                            1.542e-02  2.765e-02
+## prosper_score:prosper_ratingB                            -1.538e-02  1.341e-02
+## prosper_score:prosper_ratingC                            -1.300e-01  1.341e-02
+## prosper_score:prosper_ratingD                            -4.671e-02  1.763e-02
+## prosper_score:prosper_ratingE                            -2.278e-01  2.374e-02
+## prosper_score:prosper_ratingHR                            3.048e-01  3.264e-02
+## income_range2:stated_monthly_income                      -1.128e-04  8.382e-05
+## income_range3:stated_monthly_income                      -6.216e-05  2.569e-05
+## income_range4:stated_monthly_income                      -4.806e-05  2.068e-05
+## income_range5:stated_monthly_income                       1.719e-05  2.801e-05
+## income_range6:stated_monthly_income                              NA         NA
+## income_range7:stated_monthly_income                              NA         NA
+## current_delinquencies:delinquencies_last7_years          -1.042e-03  2.969e-04
+## public_records_last10_years:public_records_last12_months -1.064e-02  5.880e-03
+##                                                          t value Pr(&gt;|t|)    
+## (Intercept)                                               11.852  &lt; 2e-16 ***
+## number_of_days                                            46.854  &lt; 2e-16 ***
+## principal_balance                                         -3.293 0.000993 ***
+## loan_status2                                              36.897  &lt; 2e-16 ***
+## loan_status3                                               9.230  &lt; 2e-16 ***
+## loan_status4                                              -0.353 0.723982    
+## amount_funded                                            -12.772  &lt; 2e-16 ***
+## listing_term                                              54.938  &lt; 2e-16 ***
+## listing_monthly_payment                                   14.865  &lt; 2e-16 ***
+## scorex600-619                                              3.472 0.000518 ***
+## scorex620-639                                              2.525 0.011582 *  
+## scorex640-649                                              1.972 0.048601 *  
+## scorex650-664                                              3.665 0.000248 ***
+## scorex665-689                                              2.187 0.028761 *  
+## scorex690-701                                              0.820 0.411982    
+## scorex702-723                                             -0.747 0.455167    
+## scorex724-747                                             -3.150 0.001635 ** 
+## scorex748-777                                             -5.166 2.40e-07 ***
+## scorex778+                                                -5.595 2.23e-08 ***
+## prosper_score                                            -24.689  &lt; 2e-16 ***
+## listing_category_id                                       10.534  &lt; 2e-16 ***
+## income_range2                                              0.025 0.979857    
+## income_range3                                             -0.102 0.918393    
+## income_range4                                             -0.064 0.949137    
+## income_range5                                             -0.565 0.572076    
+## income_range6                                             -0.370 0.711729    
+## income_range7                                              0.253 0.800438    
+## stated_monthly_income                                     -2.189 0.028626 *  
+## income_verifiableTRUE                                      1.709 0.087387 .  
+## dti_wprosper_loan                                          1.765 0.077627 .  
+## employment_status_descriptionFull-time                     1.870 0.061437 .  
+## employment_status_descriptionNot employed                  0.468 0.639971    
+## employment_status_descriptionOther                         1.584 0.113160    
+## employment_status_descriptionPart-time                     0.770 0.441549    
+## employment_status_descriptionRetired                      -1.724 0.084631 .  
+## employment_status_descriptionSelf-employed                -4.841 1.30e-06 ***
+## monthly_debt                                               4.179 2.94e-05 ***
+## current_delinquencies                                      8.683  &lt; 2e-16 ***
+## delinquencies_last7_years                                  0.675 0.499923    
+## public_records_last10_years                                1.085 0.277716    
+## public_records_last12_months                               2.010 0.044472 *  
+## credit_lines_last7_years                                  -7.211 5.68e-13 ***
+## inquiries_last6_months                                    -3.456 0.000548 ***
+## amount_delinquent                                          2.250 0.024445 *  
+## current_credit_lines                                       3.002 0.002685 ** 
+## open_credit_lines                                         -4.546 5.48e-06 ***
+## bankcard_utilization                                       2.335 0.019565 *  
+## total_open_revolving_accounts                              5.580 2.43e-08 ***
+## revolving_available_percent                               -1.639 0.101131    
+## total_inquiries                                            3.171 0.001520 ** 
+## was_delinquent_derog                                       5.803 6.58e-09 ***
+## delinquencies_over30_days                                  2.913 0.003582 ** 
+## delinquencies_over60_days                                 -1.673 0.094242 .  
+## prosper_ratingAA                                         -11.790  &lt; 2e-16 ***
+## prosper_ratingB                                           31.252  &lt; 2e-16 ***
+## prosper_ratingC                                           74.612  &lt; 2e-16 ***
+## prosper_ratingD                                          105.443  &lt; 2e-16 ***
+## prosper_ratingE                                          146.471  &lt; 2e-16 ***
+## prosper_ratingHR                                         132.356  &lt; 2e-16 ***
+## prosper_score:prosper_ratingAA                             0.558 0.576962    
+## prosper_score:prosper_ratingB                             -1.147 0.251284    
+## prosper_score:prosper_ratingC                             -9.698  &lt; 2e-16 ***
+## prosper_score:prosper_ratingD                             -2.649 0.008065 ** 
+## prosper_score:prosper_ratingE                             -9.597  &lt; 2e-16 ***
+## prosper_score:prosper_ratingHR                             9.337  &lt; 2e-16 ***
+## income_range2:stated_monthly_income                       -1.346 0.178449    
+## income_range3:stated_monthly_income                       -2.420 0.015532 *  
+## income_range4:stated_monthly_income                       -2.323 0.020161 *  
+## income_range5:stated_monthly_income                        0.614 0.539493    
+## income_range6:stated_monthly_income                           NA       NA    
+## income_range7:stated_monthly_income                           NA       NA    
+## current_delinquencies:delinquencies_last7_years           -3.509 0.000451 ***
+## public_records_last10_years:public_records_last12_months  -1.810 0.070299 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 3.152 on 33248 degrees of freedom
-##   (242 observations deleted due to missingness)
-## Multiple R-squared:  0.7317, Adjusted R-squared:  0.7312 
-## F-statistic:  1778 on 51 and 33248 DF,  p-value: &lt; 2.2e-16</code></pre>
-<pre><code>To create our Linear Regression, we first used all variables that we deemed pertinent to the regression - 
-excluding the dependent variable (borrower_rate), irrelevant variables (loan_origination_date, occupation, 
-borrower_state, borrower_city, lender_indicator, first_recorded_credit_line), variables that repeated themselves as both factors and integers (prosper_rating, income_range_description), and those that appeared as NA on our 
-regression (total_trade_items, now_delinquent_derog, delinquencies_over_90_days)
-
-We then used the function step() to...(whatever step does)...
-
-loan_status_description???
-
-</code></pre>
+## Residual standard error: 1.299 on 33229 degrees of freedom
+## Multiple R-squared:  0.9545, Adjusted R-squared:  0.9544 
+## F-statistic:  9950 on 70 and 33229 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
-<div id="logistic-regression" class="section level2">
-<h2>Logistic Regression</h2>
-<pre class="r"><code>prospectDataNoNA = na.omit(prospectData)
-
-logReg &lt;- glm(Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + income_range + stated_monthly_income + months_employed + monthly_debt + current_delinquencies + delinquencies_last7_years + public_records_last10_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + current_credit_lines + open_credit_lines + bankcard_utilization + total_open_revolving_accounts + installment_balance + real_estate_balance + revolving_balance + real_estate_payment + revolving_available_percent + total_inquiries + satisfactory_accounts + was_delinquent_derog + delinquencies_over30_days + delinquencies_over60_days + scorex + income_range + employment_status_description + income_verifiable, data = prospectDataNoNA, family = &quot;binomial&quot;)
-
-#summary(prospectData)
-
-summary(logReg)</code></pre>
+<div id="output-of-final-logistic-regression-predicting-default" class="section level3">
+<h3>Output of Final Logistic Regression (predicting default)</h3>
 <pre><code>## 
 ## Call:
 ## glm(formula = Defaulted ~ number_of_days + principal_balance + 
 ##     amount_funded + listing_term + listing_monthly_payment + 
-##     prosper_score + income_range + stated_monthly_income + months_employed + 
-##     monthly_debt + current_delinquencies + delinquencies_last7_years + 
-##     public_records_last10_years + public_records_last12_months + 
-##     credit_lines_last7_years + inquiries_last6_months + amount_delinquent + 
-##     current_credit_lines + open_credit_lines + bankcard_utilization + 
-##     total_open_revolving_accounts + installment_balance + real_estate_balance + 
-##     revolving_balance + real_estate_payment + revolving_available_percent + 
-##     total_inquiries + satisfactory_accounts + was_delinquent_derog + 
-##     delinquencies_over30_days + delinquencies_over60_days + scorex + 
-##     income_range + employment_status_description + income_verifiable, 
-##     family = &quot;binomial&quot;, data = prospectDataNoNA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.8128  -0.4216  -0.2549  -0.1252   4.0502  
-## 
-## Coefficients:
-##                                              Estimate Std. Error z value
-## (Intercept)                                 9.713e+00  1.719e+00   5.650
-## number_of_days                             -1.228e-02  2.504e-04 -49.023
-## principal_balance                           1.332e-04  8.573e-06  15.536
-## amount_funded                              -1.912e-04  1.615e-05 -11.843
-## listing_term                                2.082e-02  2.887e-03   7.214
-## listing_monthly_payment                     4.645e-03  4.563e-04  10.180
-## prosper_score                              -1.746e-01  1.285e-02 -13.586
-## income_range2                              -6.092e-01  1.692e+00  -0.360
-## income_range3                              -8.152e-01  1.690e+00  -0.482
-## income_range4                              -8.097e-01  1.691e+00  -0.479
-## income_range5                              -9.042e-01  1.693e+00  -0.534
-## income_range6                              -1.010e+00  1.697e+00  -0.595
-## income_range7                              -1.149e+01  1.310e+02  -0.088
-## stated_monthly_income                      -1.664e-05  1.310e-05  -1.270
-## months_employed                            -9.239e-05  2.267e-04  -0.407
-## monthly_debt                                4.074e-05  3.314e-05   1.229
-## current_delinquencies                      -3.037e-01  4.333e-01  -0.701
-## delinquencies_last7_years                  -5.991e-03  3.471e-03  -1.726
-## public_records_last10_years                 1.555e-02  3.295e-02   0.472
-## public_records_last12_months                1.963e-01  9.857e-02   1.991
-## credit_lines_last7_years                    3.212e-01  4.310e-01   0.745
-## inquiries_last6_months                     -9.090e-02  2.292e-02  -3.965
-## amount_delinquent                           6.165e-06  2.475e-06   2.491
-## current_credit_lines                        4.945e-03  1.780e-02   0.278
-## open_credit_lines                          -1.021e-02  2.019e-02  -0.506
-## bankcard_utilization                       -4.288e-01  1.399e-01  -3.064
-## total_open_revolving_accounts               1.067e-02  1.121e-02   0.951
-## installment_balance                        -7.034e-08  7.238e-07  -0.097
-## real_estate_balance                        -2.226e-08  2.246e-07  -0.099
-## revolving_balance                          -1.926e-06  1.057e-06  -1.822
-## real_estate_payment                        -4.827e-07  1.239e-05  -0.039
-## revolving_available_percent                -9.486e-04  1.740e-03  -0.545
-## total_inquiries                             2.397e-02  7.249e-03   3.307
-## satisfactory_accounts                      -3.178e-01  4.311e-01  -0.737
-## was_delinquent_derog                       -3.426e-01  4.309e-01  -0.795
-## delinquencies_over30_days                   1.174e-02  5.298e-03   2.216
-## delinquencies_over60_days                   4.038e-03  1.088e-02   0.371
-## scorex600-619                               3.721e-01  2.458e-01   1.514
-## scorex620-639                               3.403e-01  2.277e-01   1.495
-## scorex640-649                               3.942e-01  2.313e-01   1.704
-## scorex650-664                               3.598e-01  2.251e-01   1.599
-## scorex665-689                               5.535e-01  2.200e-01   2.516
-## scorex690-701                               4.306e-01  2.291e-01   1.879
-## scorex702-723                               4.138e-01  2.256e-01   1.834
-## scorex724-747                               3.773e-01  2.296e-01   1.643
-## scorex748-777                               2.035e-01  2.374e-01   0.857
-## scorex778+                                  2.646e-01  2.531e-01   1.045
-## employment_status_descriptionFull-time      8.489e-01  2.247e-01   3.778
-## employment_status_descriptionNot employed   1.096e+01  1.310e+02   0.084
-## employment_status_descriptionOther          1.192e-01  9.231e-02   1.292
-## employment_status_descriptionPart-time      8.605e-01  1.341e+00   0.642
-## employment_status_descriptionRetired       -7.675e-02  9.113e-01  -0.084
-## employment_status_descriptionSelf-employed -1.283e+00  2.000e-01  -6.417
-## income_verifiableTRUE                      -8.269e-01  1.766e-01  -4.682
-##                                            Pr(&gt;|z|)    
-## (Intercept)                                1.61e-08 ***
-## number_of_days                              &lt; 2e-16 ***
-## principal_balance                           &lt; 2e-16 ***
-## amount_funded                               &lt; 2e-16 ***
-## listing_term                               5.45e-13 ***
-## listing_monthly_payment                     &lt; 2e-16 ***
-## prosper_score                               &lt; 2e-16 ***
-## income_range2                              0.718804    
-## income_range3                              0.629592    
-## income_range4                              0.632013    
-## income_range5                              0.593192    
-## income_range6                              0.551810    
-## income_range7                              0.930101    
-## stated_monthly_income                      0.203959    
-## months_employed                            0.683661    
-## monthly_debt                               0.219000    
-## current_delinquencies                      0.483446    
-## delinquencies_last7_years                  0.084339 .  
-## public_records_last10_years                0.636990    
-## public_records_last12_months               0.046461 *  
-## credit_lines_last7_years                   0.456166    
-## inquiries_last6_months                     7.33e-05 ***
-## amount_delinquent                          0.012748 *  
-## current_credit_lines                       0.781153    
-## open_credit_lines                          0.612971    
-## bankcard_utilization                       0.002182 ** 
-## total_open_revolving_accounts              0.341578    
-## installment_balance                        0.922582    
-## real_estate_balance                        0.921041    
-## revolving_balance                          0.068394 .  
-## real_estate_payment                        0.968935    
-## revolving_available_percent                0.585730    
-## total_inquiries                            0.000943 ***
-## satisfactory_accounts                      0.460973    
-## was_delinquent_derog                       0.426506    
-## delinquencies_over30_days                  0.026661 *  
-## delinquencies_over60_days                  0.710459    
-## scorex600-619                              0.130094    
-## scorex620-639                              0.134971    
-## scorex640-649                              0.088360 .  
-## scorex650-664                              0.109922    
-## scorex665-689                              0.011885 *  
-## scorex690-701                              0.060238 .  
-## scorex702-723                              0.066585 .  
-## scorex724-747                              0.100348    
-## scorex748-777                              0.391475    
-## scorex778+                                 0.295866    
-## employment_status_descriptionFull-time     0.000158 ***
-## employment_status_descriptionNot employed  0.933350    
-## employment_status_descriptionOther         0.196423    
-## employment_status_descriptionPart-time     0.520977    
-## employment_status_descriptionRetired       0.932885    
-## employment_status_descriptionSelf-employed 1.39e-10 ***
-## income_verifiableTRUE                      2.85e-06 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 25592  on 33299  degrees of freedom
-## Residual deviance: 14986  on 33246  degrees of freedom
-## AIC: 15094
-## 
-## Number of Fisher Scoring iterations: 12</code></pre>
-<pre class="r"><code>#stepLogreg &lt;- step(logReg, direction = &quot;backward&quot;)
-
-
-#summary(stepLogreg)
-
-
-finalModel = glm(formula = Defaulted ~ number_of_days + principal_balance + amount_funded + listing_term + listing_monthly_payment + prosper_score + stated_monthly_income + delinquencies_last7_years + public_records_last12_months + credit_lines_last7_years + inquiries_last6_months + amount_delinquent + bankcard_utilization + revolving_balance + total_inquiries + was_delinquent_derog + delinquencies_over30_days + scorex + employment_status_description + income_verifiable, family = &quot;binomial&quot;, data = prospectDataNoNA)
-
-summary(finalModel)</code></pre>
-<pre><code>## 
-## Call:
-## glm(formula = Defaulted ~ number_of_days + principal_balance + 
-##     amount_funded + listing_term + listing_monthly_payment + 
-##     prosper_score + stated_monthly_income + delinquencies_last7_years + 
+##     prosper_score + income_range + delinquencies_last7_years + 
 ##     public_records_last12_months + credit_lines_last7_years + 
 ##     inquiries_last6_months + amount_delinquent + bankcard_utilization + 
 ##     revolving_balance + total_inquiries + was_delinquent_derog + 
 ##     delinquencies_over30_days + scorex + employment_status_description + 
-##     income_verifiable, family = &quot;binomial&quot;, data = prospectDataNoNA)
+##     income_verifiable + prosper_rating, family = &quot;binomial&quot;, 
+##     data = prospectDataNoNA)
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -1.8260  -0.4215  -0.2560  -0.1255   4.0940  
+## -1.8431  -0.4178  -0.2551  -0.1246   4.0226  
 ## 
 ## Coefficients:
 ##                                              Estimate Std. Error z value
-## (Intercept)                                 8.996e+00  3.732e-01  24.105
-## number_of_days                             -1.229e-02  2.500e-04 -49.160
-## principal_balance                           1.337e-04  8.555e-06  15.632
-## amount_funded                              -1.934e-04  1.599e-05 -12.095
-## listing_term                                2.071e-02  2.872e-03   7.212
-## listing_monthly_payment                     4.672e-03  4.530e-04  10.312
-## prosper_score                              -1.763e-01  1.268e-02 -13.903
-## stated_monthly_income                      -3.303e-05  8.593e-06  -3.844
-## delinquencies_last7_years                  -5.297e-03  3.117e-03  -1.700
-## public_records_last12_months                2.043e-01  9.256e-02   2.207
-## credit_lines_last7_years                    4.689e-03  1.956e-03   2.398
-## inquiries_last6_months                     -9.562e-02  2.271e-02  -4.211
-## amount_delinquent                           6.097e-06  2.372e-06   2.571
-## bankcard_utilization                       -4.111e-01  9.842e-02  -4.177
-## revolving_balance                          -1.366e-06  9.185e-07  -1.487
-## total_inquiries                             2.359e-02  7.066e-03   3.339
-## was_delinquent_derog                       -2.726e-02  1.051e-02  -2.594
-## delinquencies_over30_days                   1.287e-02  4.536e-03   2.836
-## scorex600-619                               3.630e-01  2.452e-01   1.480
-## scorex620-639                               3.274e-01  2.268e-01   1.443
-## scorex640-649                               3.732e-01  2.302e-01   1.621
-## scorex650-664                               3.416e-01  2.237e-01   1.527
-## scorex665-689                               5.269e-01  2.179e-01   2.419
-## scorex690-701                               3.972e-01  2.261e-01   1.757
-## scorex702-723                               3.762e-01  2.215e-01   1.699
-## scorex724-747                               3.342e-01  2.238e-01   1.493
-## scorex748-777                               1.510e-01  2.290e-01   0.659
-## scorex778+                                  2.029e-01  2.396e-01   0.847
-## employment_status_descriptionFull-time      8.596e-01  2.229e-01   3.856
-## employment_status_descriptionNot employed   2.274e-01  5.114e-01   0.445
-## employment_status_descriptionOther          1.599e-01  8.982e-02   1.781
-## employment_status_descriptionPart-time      9.295e-01  1.336e+00   0.696
-## employment_status_descriptionRetired       -5.276e-02  9.140e-01  -0.058
-## employment_status_descriptionSelf-employed -1.261e+00  1.977e-01  -6.381
-## income_verifiableTRUE                      -8.128e-01  1.740e-01  -4.671
+## (Intercept)                                 8.686e+00  1.717e+00   5.059
+## number_of_days                             -1.234e-02  2.508e-04 -49.189
+## principal_balance                           1.297e-04  8.558e-06  15.155
+## amount_funded                              -1.833e-04  1.638e-05 -11.192
+## listing_term                                2.292e-02  3.079e-03   7.444
+## listing_monthly_payment                     4.718e-03  4.622e-04  10.206
+## prosper_score                              -1.415e-01  1.644e-02  -8.609
+## income_range2                               6.622e-03  1.688e+00   0.004
+## income_range3                              -1.788e-01  1.687e+00  -0.106
+## income_range4                              -1.905e-01  1.687e+00  -0.113
+## income_range5                              -3.186e-01  1.688e+00  -0.189
+## income_range6                              -4.938e-01  1.688e+00  -0.292
+## income_range7                              -1.138e+01  1.320e+02  -0.086
+## delinquencies_last7_years                  -5.207e-03  3.121e-03  -1.668
+## public_records_last12_months                2.138e-01  9.231e-02   2.317
+## credit_lines_last7_years                    4.339e-03  1.977e-03   2.195
+## inquiries_last6_months                     -9.826e-02  2.284e-02  -4.302
+## amount_delinquent                           5.760e-06  2.394e-06   2.406
+## bankcard_utilization                       -4.203e-01  9.941e-02  -4.228
+## revolving_balance                          -1.744e-06  9.231e-07  -1.890
+## total_inquiries                             2.278e-02  7.112e-03   3.204
+## was_delinquent_derog                       -2.928e-02  1.058e-02  -2.767
+## delinquencies_over30_days                   1.286e-02  4.565e-03   2.817
+## scorex600-619                               3.791e-01  2.460e-01   1.541
+## scorex620-639                               3.750e-01  2.273e-01   1.650
+## scorex640-649                               4.708e-01  2.309e-01   2.039
+## scorex650-664                               4.350e-01  2.246e-01   1.937
+## scorex665-689                               6.651e-01  2.190e-01   3.037
+## scorex690-701                               5.478e-01  2.274e-01   2.409
+## scorex702-723                               5.390e-01  2.231e-01   2.416
+## scorex724-747                               4.932e-01  2.255e-01   2.187
+## scorex748-777                               3.001e-01  2.312e-01   1.298
+## scorex778+                                  3.157e-01  2.426e-01   1.301
+## employment_status_descriptionFull-time      7.918e-01  2.257e-01   3.508
+## employment_status_descriptionNot employed   1.100e+01  1.320e+02   0.083
+## employment_status_descriptionOther          1.377e-01  9.228e-02   1.493
+## employment_status_descriptionPart-time      8.546e-01  1.380e+00   0.619
+## employment_status_descriptionRetired       -6.329e-02  8.929e-01  -0.071
+## employment_status_descriptionSelf-employed -1.280e+00  2.000e-01  -6.397
+## income_verifiableTRUE                      -8.880e-01  1.769e-01  -5.020
+## prosper_ratingAA                           -2.609e-01  1.891e-01  -1.380
+## prosper_ratingB                            -1.101e-01  8.807e-02  -1.250
+## prosper_ratingC                            -1.541e-01  9.593e-02  -1.606
+## prosper_ratingD                             8.162e-02  1.147e-01   0.712
+## prosper_ratingE                             2.938e-01  1.244e-01   2.362
+## prosper_ratingHR                            7.654e-01  1.497e-01   5.111
 ##                                            Pr(&gt;|z|)    
-## (Intercept)                                 &lt; 2e-16 ***
+## (Intercept)                                4.21e-07 ***
 ## number_of_days                              &lt; 2e-16 ***
 ## principal_balance                           &lt; 2e-16 ***
 ## amount_funded                               &lt; 2e-16 ***
-## listing_term                               5.52e-13 ***
+## listing_term                               9.74e-14 ***
 ## listing_monthly_payment                     &lt; 2e-16 ***
 ## prosper_score                               &lt; 2e-16 ***
-## stated_monthly_income                      0.000121 ***
-## delinquencies_last7_years                  0.089207 .  
-## public_records_last12_months               0.027305 *  
-## credit_lines_last7_years                   0.016495 *  
-## inquiries_last6_months                     2.55e-05 ***
-## amount_delinquent                          0.010150 *  
-## bankcard_utilization                       2.96e-05 ***
-## revolving_balance                          0.137096    
-## total_inquiries                            0.000842 ***
-## was_delinquent_derog                       0.009474 ** 
-## delinquencies_over30_days                  0.004561 ** 
-## scorex600-619                              0.138818    
-## scorex620-639                              0.148945    
-## scorex640-649                              0.104926    
-## scorex650-664                              0.126740    
-## scorex665-689                              0.015583 *  
-## scorex690-701                              0.078885 .  
-## scorex702-723                              0.089372 .  
-## scorex724-747                              0.135362    
-## scorex748-777                              0.509617    
-## scorex778+                                 0.397017    
-## employment_status_descriptionFull-time     0.000115 ***
-## employment_status_descriptionNot employed  0.656573    
-## employment_status_descriptionOther         0.074967 .  
-## employment_status_descriptionPart-time     0.486614    
-## employment_status_descriptionRetired       0.953963    
-## employment_status_descriptionSelf-employed 1.76e-10 ***
-## income_verifiableTRUE                      3.00e-06 ***
+## income_range2                              0.996870    
+## income_range3                              0.915549    
+## income_range4                              0.910074    
+## income_range5                              0.850261    
+## income_range6                              0.769913    
+## income_range7                              0.931309    
+## delinquencies_last7_years                  0.095279 .  
+## public_records_last12_months               0.020523 *  
+## credit_lines_last7_years                   0.028148 *  
+## inquiries_last6_months                     1.69e-05 ***
+## amount_delinquent                          0.016118 *  
+## bankcard_utilization                       2.36e-05 ***
+## revolving_balance                          0.058771 .  
+## total_inquiries                            0.001358 ** 
+## was_delinquent_derog                       0.005659 ** 
+## delinquencies_over30_days                  0.004841 ** 
+## scorex600-619                              0.123291    
+## scorex620-639                              0.099034 .  
+## scorex640-649                              0.041457 *  
+## scorex650-664                              0.052769 .  
+## scorex665-689                              0.002391 ** 
+## scorex690-701                              0.015994 *  
+## scorex702-723                              0.015677 *  
+## scorex724-747                              0.028740 *  
+## scorex748-777                              0.194152    
+## scorex778+                                 0.193194    
+## employment_status_descriptionFull-time     0.000451 ***
+## employment_status_descriptionNot employed  0.933615    
+## employment_status_descriptionOther         0.135500    
+## employment_status_descriptionPart-time     0.535784    
+## employment_status_descriptionRetired       0.943487    
+## employment_status_descriptionSelf-employed 1.58e-10 ***
+## income_verifiableTRUE                      5.16e-07 ***
+## prosper_ratingAA                           0.167571    
+## prosper_ratingB                            0.211246    
+## prosper_ratingC                            0.108257    
+## prosper_ratingD                            0.476522    
+## prosper_ratingE                            0.018162 *  
+## prosper_ratingHR                           3.20e-07 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 25592  on 33299  degrees of freedom
-## Residual deviance: 14998  on 33265  degrees of freedom
-## AIC: 15068
+## Residual deviance: 14922  on 33254  degrees of freedom
+## AIC: 15014
 ## 
-## Number of Fisher Scoring iterations: 6</code></pre>
-<pre class="r"><code>logisticVar =  finalModel$coefficients
-logisticVar</code></pre>
-<pre><code>##                                (Intercept) 
-##                               8.995958e+00 
-##                             number_of_days 
-##                              -1.228866e-02 
-##                          principal_balance 
-##                               1.337349e-04 
-##                              amount_funded 
-##                              -1.934282e-04 
-##                               listing_term 
-##                               2.071145e-02 
-##                    listing_monthly_payment 
-##                               4.671632e-03 
-##                              prosper_score 
-##                              -1.762728e-01 
-##                      stated_monthly_income 
-##                              -3.302579e-05 
-##                  delinquencies_last7_years 
-##                              -5.297455e-03 
-##               public_records_last12_months 
-##                               2.042938e-01 
-##                   credit_lines_last7_years 
-##                               4.689246e-03 
-##                     inquiries_last6_months 
-##                              -9.561846e-02 
-##                          amount_delinquent 
-##                               6.096560e-06 
-##                       bankcard_utilization 
-##                              -4.110861e-01 
-##                          revolving_balance 
-##                              -1.365481e-06 
-##                            total_inquiries 
-##                               2.359180e-02 
-##                       was_delinquent_derog 
-##                              -2.725554e-02 
-##                  delinquencies_over30_days 
-##                               1.286742e-02 
-##                              scorex600-619 
-##                               3.629787e-01 
-##                              scorex620-639 
-##                               3.273725e-01 
-##                              scorex640-649 
-##                               3.732097e-01 
-##                              scorex650-664 
-##                               3.416438e-01 
-##                              scorex665-689 
-##                               5.269007e-01 
-##                              scorex690-701 
-##                               3.972385e-01 
-##                              scorex702-723 
-##                               3.761821e-01 
-##                              scorex724-747 
-##                               3.341512e-01 
-##                              scorex748-777 
-##                               1.510035e-01 
-##                                 scorex778+ 
-##                               2.029426e-01 
-##     employment_status_descriptionFull-time 
-##                               8.595839e-01 
-##  employment_status_descriptionNot employed 
-##                               2.273952e-01 
-##         employment_status_descriptionOther 
-##                               1.599383e-01 
-##     employment_status_descriptionPart-time 
-##                               9.295430e-01 
-##       employment_status_descriptionRetired 
-##                              -5.276365e-02 
-## employment_status_descriptionSelf-employed 
-##                              -1.261298e+00 
-##                      income_verifiableTRUE 
-##                              -8.127902e-01</code></pre>
-<pre class="r"><code>linearVar = stepModel$coefficients
-linearVar</code></pre>
-<pre><code>##                                (Intercept) 
-##                               3.164460e+01 
-##                             number_of_days 
-##                               3.276157e-03 
-##                          principal_balance 
-##                               7.196671e-05 
-##                               loan_status2 
-##                               1.970718e+00 
-##                               loan_status3 
-##                               9.683436e-01 
-##                               loan_status4 
-##                               5.248459e-01 
-##                              amount_funded 
-##                              -3.578034e-04 
-##                               listing_term 
-##                               1.190468e-01 
-##                    listing_monthly_payment 
-##                               8.408537e-03 
-##                              scorex600-619 
-##                               5.761994e-01 
-##                              scorex620-639 
-##                              -1.591488e-01 
-##                              scorex640-649 
-##                              -7.955541e-01 
-##                              scorex650-664 
-##                              -1.129296e+00 
-##                              scorex665-689 
-##                              -2.077369e+00 
-##                              scorex690-701 
-##                              -2.781312e+00 
-##                              scorex702-723 
-##                              -3.441212e+00 
-##                              scorex724-747 
-##                              -4.049751e+00 
-##                              scorex748-777 
-##                              -4.628637e+00 
-##                                 scorex778+ 
-##                              -4.567341e+00 
-##                              prosper_score 
-##                              -1.517976e+00 
-##                        listing_category_id 
-##                               5.755116e-02 
-##                              income_range2 
-##                              -8.780408e+00 
-##                              income_range3 
-##                              -1.008656e+01 
-##                              income_range4 
-##                              -1.046900e+01 
-##                              income_range5 
-##                              -1.042760e+01 
-##                              income_range6 
-##                              -1.035374e+01 
-##                              income_range7 
-##                              -5.652937e-01 
-##                      stated_monthly_income 
-##                              -7.911001e-06 
-##                          dti_wprosper_loan 
-##                              -6.838783e-07 
-##     employment_status_descriptionFull-time 
-##                               1.946562e-01 
-##  employment_status_descriptionNot employed 
-##                              -7.273595e-02 
-##         employment_status_descriptionOther 
-##                               2.123587e-01 
-##     employment_status_descriptionPart-time 
-##                              -1.825431e-01 
-##       employment_status_descriptionRetired 
-##                              -8.286028e-01 
-## employment_status_descriptionSelf-employed 
-##                              -8.607415e-01 
-##                            months_employed 
-##                              -3.283862e-04 
-##                               monthly_debt 
-##                               5.637460e-04 
-##                public_records_last10_years 
-##                               1.871888e-01 
-##                   credit_lines_last7_years 
-##                               1.913607e-01 
-##                     inquiries_last6_months 
-##                               3.063850e-02 
-##                          amount_delinquent 
-##                               7.278590e-06 
-##                       current_credit_lines 
-##                               2.871758e-02 
-##                          open_credit_lines 
-##                              -9.068822e-02 
-##                       bankcard_utilization 
-##                               2.496102e-01 
-##              total_open_revolving_accounts 
-##                               1.000603e-01 
-##                        installment_balance 
-##                              -1.179939e-06 
-##                        real_estate_balance 
-##                               3.129664e-07 
-##                revolving_available_percent 
-##                              -9.861388e-03 
-##                            total_inquiries 
-##                               2.280889e-02 
-##                      satisfactory_accounts 
-##                              -2.136163e-01 
-##                       was_delinquent_derog 
-##                              -1.050866e-01 
-##                  delinquencies_over30_days 
-##                               9.448407e-03</code></pre>
+## Number of Fisher Scoring iterations: 12</code></pre>
+</div>
 </div>
 
 
